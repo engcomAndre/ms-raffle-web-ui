@@ -8,17 +8,19 @@ interface GoogleLoginSectionProps {
   title?: string
   description?: string
   variant?: 'blue' | 'green' | 'purple'
+  onGoogleLogin?: (credential: string) => void
 }
 
 export function GoogleLoginSection({ 
   buttonId, 
   title = "🚀 Login Rápido com Google",
   description = "Clique no botão oficial do Google quando aparecer",
-  variant = 'blue'
+  variant = 'blue',
+  onGoogleLogin
 }: GoogleLoginSectionProps) {
   const [isLoaded, setIsLoaded] = useState(false)
   const buttonRef = useRef<HTMLDivElement>(null)
-  const { registerButton, googleReady, buttonRendered } = useGoogleButtonSafe()
+  const { registerButton, googleReady, buttonRendered } = useGoogleButtonSafe(onGoogleLogin)
 
   const variants = {
     blue: {

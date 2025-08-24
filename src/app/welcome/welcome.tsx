@@ -1,15 +1,45 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useGoogleButtonSafe } from '@/hooks/useGoogleButtonSafe'
+import { UserPassLoginService } from '@/services/userPassLoginService'
+import { GoogleLoginService } from '@/services/googleLoginService'
+import { UserRegistrationData } from '@/services/authService'
 import { GoogleLoginSection } from '@/components/GoogleLoginSection'
 
 export default function WelcomePage() {
-  const { login } = useGoogleButtonSafe()
+  const router = useRouter()
+  const [shouldRedirect, setShouldRedirect] = useState(false)
+  
+  // Instanciar os serviços
+  const userPassLoginService = new UserPassLoginService()
+  const googleLoginService = new GoogleLoginService()
+  
+  // Importar AuthService para cadastro
+  const { AuthService } = require('@/services/authService')
+  const authService = new AuthService()
+  
+  // Verificação de autenticação usando useEffect
+  useEffect(() => {
+    const token = localStorage.getItem('auth-token')
+    const username = localStorage.getItem('auth-username')
+    
+    if (token && username) {
+      console.log('🔄 [WELCOME] Usuário já autenticado via localStorage, redirecionando para /playground...')
+      setShouldRedirect(true)
+    }
+  }, [])
+
+  // Redirecionamento usando useEffect separado
+  useEffect(() => {
+    if (shouldRedirect) {
+      window.location.href = '/playground'
+    }
+  }, [shouldRedirect])
   
   // Estados para login
-  const [loginEmail, setLoginEmail] = useState('')
+  const [loginUsername, setLoginUsername] = useState('')
   const [loginPassword, setLoginPassword] = useState('')
   const [isLoginLoading, setIsLoginLoading] = useState(false)
   const [loginError, setLoginError] = useState('')
@@ -33,19 +63,110 @@ export default function WelcomePage() {
     setLoginError('')
 
     try {
-      const result = await login(loginEmail, loginPassword)
+      console.log('🔐 [WELCOME-LOGIN] Iniciando processo de login')
+      console.log('🔍 [WELCOME-LOGIN] Serviço disponível:', !!userPassLoginService)
       
-      if (!result.success) {
+      // Preparar dados para o serviço
+      const loginData = {
+        username: loginUsername,
+        password: loginPassword
+      }
+
+      console.log('📤 [WELCOME-LOGIN] Enviando dados para o serviço:', loginData)
+
+      // Chamar o serviço de login com usuário e senha
+      console.log('🔄 [WELCOME-LOGIN] Chamando userPassLoginService.login...')
+      const result = await userPassLoginService.login(loginData)
+      console.log('📥 [WELCOME-LOGIN] Resultado recebido:', result)
+      
+      if (result.success) {
+        console.log('✅ [WELCOME-LOGIN] Login realizado com sucesso:', result.data)
+        setLoginError('')
+        
+        // Debug: verificar se o router está disponível
+        console.log('🔍 [WELCOME-LOGIN] Router disponível:', !!router)
+        console.log('🔍 [WELCOME-LOGIN] Tipo do router:', typeof router)
+        console.log('🔍 [WELCOME-LOGIN] Métodos do router:', Object.getOwnPropertyNames(router))
+        
+        // Debug: verificar o estado atual
+        console.log('🔍 [WELCOME-LOGIN] Estado atual - isLoginLoading:', isLoginLoading)
+        console.log('🔍 [WELCOME-LOGIN] Estado atual - loginError:', loginError)
+        
+        // Redirecionar para o playground usando redirecionamento direto
+        console.log('🚀 [WELCOME-LOGIN] Redirecionando para /playground...')
+        
+        // Usar redirecionamento direto para garantir que funcione
+        setTimeout(() => {
+          console.log('🔄 [WELCOME-LOGIN] Executando redirecionamento direto...')
+          
+          // Tentar múltiplas abordagens
+          try {
+            // Método 1: window.location.href
+            console.log('🔄 [WELCOME-LOGIN] Tentando window.location.href...')
+            window.location.href = '/playground'
+          } catch (error) {
+            console.error('❌ [WELCOME-LOGIN] Erro com window.location.href:', error)
+            
+            try {
+              // Método 2: window.location.replace
+              console.log('🔄 [WELCOME-LOGIN] Tentando window.location.replace...')
+              window.location.replace('/playground')
+            } catch (replaceError) {
+              console.error('❌ [WELCOME-LOGIN] Erro com window.location.replace:', replaceError)
+              
+              // Método 3: window.location.assign
+              console.log('🔄 [WELCOME-LOGIN] Tentando window.location.assign...')
+              window.location.assign('/playground')
+            }
+          }
+          
+          console.log('✅ [WELCOME-LOGIN] Redirecionamento direto executado')
+        }, 100)
+      } else {
+        console.log('❌ [WELCOME-LOGIN] Erro no login:', result.error)
         setLoginError(result.error || 'Erro ao fazer login')
       }
     } catch (err) {
+      console.error('💥 [WELCOME-LOGIN] Erro durante o login:', err)
       setLoginError('Erro ao fazer login')
     } finally {
       setIsLoginLoading(false)
     }
   }
 
-  // Google login agora é handled automaticamente pelo botão renderizado
+  // Função para lidar com login do Google
+  const handleGoogleLogin = async (credential: string) => {
+    try {
+      console.log('🔐 [WELCOME-GOOGLE] Iniciando login com Google')
+      console.log('🔍 [WELCOME-GOOGLE] Serviço disponível:', !!googleLoginService)
+      console.log('🔍 [WELCOME-GOOGLE] Credential recebida:', credential.substring(0, 50) + '...')
+      
+      const result = await googleLoginService.handleGoogleLogin(credential)
+      console.log('📥 [WELCOME-GOOGLE] Resultado recebido:', result)
+      
+      if (result.success) {
+        console.log('✅ [WELCOME-GOOGLE] Login com Google realizado com sucesso')
+        
+        // Debug: verificar se o router está disponível
+        console.log('🔍 [WELCOME-GOOGLE] Router disponível:', !!router)
+        console.log('🔍 [WELCOME-GOOGLE] Tipo do router:', typeof router)
+        
+        // Redirecionar para o playground usando redirecionamento direto
+        console.log('🚀 [WELCOME-GOOGLE] Redirecionando para /playground...')
+        
+        // Usar redirecionamento direto para garantir que funcione
+        setTimeout(() => {
+          console.log('🔄 [WELCOME-GOOGLE] Executando redirecionamento direto...')
+          window.location.href = '/playground'
+          console.log('✅ [WELCOME-GOOGLE] Redirecionamento direto executado')
+        }, 100)
+      } else {
+        console.log('❌ [WELCOME-GOOGLE] Erro no login com Google:', result.error)
+      }
+    } catch (error) {
+      console.error('💥 [WELCOME-GOOGLE] Erro durante login com Google:', error)
+    }
+  }
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -73,12 +194,23 @@ export default function WelcomePage() {
         return
       }
 
-      // Simulação de registro
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      const result = { success: true }
+      // Preparar dados para o serviço
+      const userData: UserRegistrationData = {
+        firstName: registerData.firstName,
+        lastName: registerData.lastName,
+        email: registerData.email,
+        username: registerData.username,
+        password: registerData.password,
+        roles: ['USER']
+      }
+
+      console.log('📤 [WELCOME-REGISTER] Enviando dados para o serviço:', userData)
+
+      // Chamar o serviço de cadastro
+      const result = await authService.register(userData)
       
       if (result.success) {
-        setRegisterSuccess('Conta criada com sucesso! Faça login para continuar.')
+        setRegisterSuccess(result.message || 'Conta criada com sucesso! Faça login para continuar.')
         
         // Limpar formulário
         setRegisterData({
@@ -89,8 +221,14 @@ export default function WelcomePage() {
           firstName: '',
           lastName: ''
         })
+        
+        // Aguardar um pouco e redirecionar para o playground
+        setTimeout(() => {
+          console.log('🚀 [WELCOME-REGISTER] Redirecionando para o playground após cadastro...')
+          window.location.href = '/playground'
+        }, 2000) // 2 segundos de delay
       } else {
-        setRegisterError('Erro ao criar conta')
+        setRegisterError(result.error || 'Erro ao criar conta')
       }
     } catch (err) {
       setRegisterError('Erro ao criar conta')
@@ -126,16 +264,16 @@ export default function WelcomePage() {
             {/* Bloco dos campos de login */}
             <div className="bg-gray-50 p-6 rounded-lg space-y-4">
               <div>
-                <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email
+                <label htmlFor="login-username" className="block text-sm font-medium text-gray-700 mb-2">
+                  Nome de usuário
                 </label>
                 <input
-                  type="email"
-                  id="login-email"
-                  value={loginEmail}
-                  onChange={(e) => setLoginEmail(e.target.value)}
+                  type="text"
+                  id="login-username"
+                  value={loginUsername}
+                  onChange={(e) => setLoginUsername(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="seu@email.com"
+                  placeholder="nome_usuario"
                   required
                 />
               </div>
@@ -180,12 +318,13 @@ export default function WelcomePage() {
             buttonId="welcome-google-button"
             description="Login com Google"
             variant="purple"
+            onGoogleLogin={handleGoogleLogin}
           />
 
           <div className="mt-8 p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600 mb-2">Credenciais de teste:</p>
-            <p className="text-sm"><strong>Email:</strong> admin@msraffle.com</p>
-            <p className="text-sm"><strong>Senha:</strong> 123456</p>
+            <p className="text-sm"><strong>Username:</strong> admin</p>
+            <p className="text-sm"><strong>Senha:</strong> admin123</p>
           </div>
         </div>
 

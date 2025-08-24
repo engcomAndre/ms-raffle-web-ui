@@ -21,7 +21,7 @@ interface GoogleCredentialResponse {
   client_id: string
 }
 
-export function useGoogleButtonSafe() {
+export function useGoogleButtonSafe(onGoogleLogin?: (credential: string) => void) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -152,6 +152,13 @@ export function useGoogleButtonSafe() {
       console.log('✅ Login Google bem-sucedido!', response)
       setIsLoading(true)
       
+      // Se houver callback externo, usar ele
+      if (onGoogleLogin) {
+        console.log('🔄 [GOOGLE] Usando callback externo')
+        await onGoogleLogin(response.credential)
+        return
+      }
+      
       // Decodificar token JWT
       const payload = JSON.parse(atob(response.credential.split('.')[1]))
       console.log('👤 Dados do usuário:', payload)
@@ -161,7 +168,7 @@ export function useGoogleButtonSafe() {
         name: payload.name,
         email: payload.email,
         username: payload.email.split('@')[0],
-        picture: payload.picture,
+        picture: payload.payload,
         provider: 'google'
       }
 

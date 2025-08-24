@@ -4,29 +4,15 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
-  // Verificar se existe um token de autenticação
-  const token = request.cookies.get('auth-token')?.value || 
-                request.headers.get('authorization')?.replace('Bearer ', '')
+  // TEMPORARIAMENTE DESABILITADO para testar redirecionamento
+  // TODO: Implementar verificação de token via localStorage ou cookies
   
-  // Rotas que não precisam de autenticação
-  const publicRoutes = ['/welcome', '/login', '/register']
-  const isPublicRoute = publicRoutes.includes(pathname)
-  
-  // Se estiver na rota raiz e não tiver token, redirecionar para /welcome
-  if (pathname === '/' && !token) {
+  // Se estiver na rota raiz, redirecionar para /welcome
+  if (pathname === '/') {
     return NextResponse.redirect(new URL('/welcome', request.url))
   }
   
-  // Se estiver em uma rota protegida e não tiver token, redirecionar para /welcome
-  if ((pathname.startsWith('/dashboard') || pathname.startsWith('/playground')) && !token) {
-    return NextResponse.redirect(new URL('/welcome', request.url))
-  }
-  
-  // Se tiver token e estiver em uma rota pública, redirecionar para /playground
-  if (token && isPublicRoute) {
-    return NextResponse.redirect(new URL('/playground', request.url))
-  }
-  
+  // Permitir acesso a todas as outras rotas por enquanto
   return NextResponse.next()
 }
 

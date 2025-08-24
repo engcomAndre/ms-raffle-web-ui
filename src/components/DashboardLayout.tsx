@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, ReactNode } from 'react'
-import { useGoogleButtonSafe } from '@/hooks/useGoogleButtonSafe'
+import { useState, useEffect, ReactNode } from 'react'
 import Image from 'next/image'
+import { useLogout } from '@/hooks/useLogout'
 
 interface DashboardLayoutProps {
   children: ReactNode
@@ -10,10 +10,35 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children, currentPage = 'Minhas Rifas' }: DashboardLayoutProps) {
-  const { user, logout } = useGoogleButtonSafe()
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  
+  // Obter dados do usuário do localStorage
+  const [user, setUser] = useState<any>(null)
+
+  // Carregar dados do usuário no useEffect
+  useEffect(() => {
+    const token = localStorage.getItem('auth-token')
+    const username = localStorage.getItem('auth-username')
+    const email = localStorage.getItem('auth-email')
+    const picture = localStorage.getItem('google-user-picture')
+    const provider = localStorage.getItem('auth-provider')
+    
+    if (token && username) {
+      setUser({
+        name: username,
+        email: email || username,
+        picture: picture || null,
+        provider: provider || 'userpass'
+      })
+    }
+  }, [])
+
+  const { logout } = useLogout()
 
   const handleLogout = () => {
+    // Fechar dropdown
+    setDropdownOpen(false)
+    // Executar logout
     logout()
   }
 
