@@ -12,6 +12,7 @@ export const environment = {
     auth: {
       register: '/v1/users',
       login: '/v1/token',
+      external: '/v1/users/external',
       verify: '/api/auth/verify',
       logout: '/api/auth/logout',
     }
