@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/stores/authStore'
+import { authService, ExternalUserRegistrationData } from './authService'
 
 export interface GoogleUserData {
   id: string
@@ -62,6 +63,9 @@ export class GoogleLoginService {
       if (userData) {
         console.log('✅ [GOOGLE-LOGIN] Dados do Google decodificados:', userData)
         
+        // Cadastrar usuário no backend
+        await this.registerGoogleUser(userData)
+        
         // Usar Zustand para gerenciar estado global
         const authStore = useAuthStore.getState()
         
@@ -81,6 +85,54 @@ export class GoogleLoginService {
     } catch (error) {
       console.error('💥 [GOOGLE-LOGIN] Erro durante o login:', error)
       return { success: false, error: 'Erro interno durante o login com Google' }
+    }
+  }
+
+  /**
+   * Cadastra o usuário Google no backend
+   */
+  private async registerGoogleUser(userData: GoogleUserData): Promise<void> {
+    try {
+      console.log('👤 [GOOGLE-LOGIN] Iniciando cadastro no backend...')
+      
+      // Separar nome em firstName e lastName
+      const nameParts = userData.name.split(' ')
+      const firstName = nameParts[0] || userData.name
+      const lastName = nameParts.slice(1).join(' ') || firstName
+      
+      // Preparar dados para o backend
+      const externalUserData: ExternalUserRegistrationData = {
+        email: userData.email,
+        firstName: firstName,
+        lastName: lastName,
+        authProvider: 'google'
+      }
+      
+      console.log('📤 [GOOGLE-LOGIN] Enviando dados para o backend:', externalUserData)
+      
+      // Chamar o backend para cadastro
+      const response = await authService.registerExternalUser(externalUserData)
+      
+      if (response.success) {
+        if (response.data?.isNewUser) {
+          console.log('✅ [GOOGLE-LOGIN] Usuário criado com sucesso no backend')
+        } else {
+          console.log('✅ [GOOGLE-LOGIN] Usuário já existe no backend')
+        }
+        
+        // Salvar ID do usuário do backend se disponível
+        if (response.data?.id) {
+          localStorage.setItem('backend-user-id', response.data.id)
+          console.log('💾 [GOOGLE-LOGIN] ID do backend salvo:', response.data.id)
+        }
+      } else {
+        console.warn('⚠️ [GOOGLE-LOGIN] Erro no cadastro do backend:', response.error)
+        // Continuar mesmo com erro no backend
+      }
+      
+    } catch (error) {
+      console.error('❌ [GOOGLE-LOGIN] Erro durante cadastro no backend:', error)
+      // Continuar mesmo com erro no backend
     }
   }
 

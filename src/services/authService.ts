@@ -11,6 +11,24 @@ export interface UserRegistrationData {
   roles: string[]
 }
 
+// Interface para cadastro de usuários externos (Google, etc.)
+export interface ExternalUserRegistrationData {
+  email: string
+  firstName: string
+  lastName: string
+  authProvider: 'google' | 'facebook' | 'github'
+}
+
+export interface ExternalUserRegistrationResponse {
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+  authProvider: string
+  isNewUser: boolean
+  message?: string
+}
+
 export interface UserRegistrationResponse {
   id: string
   firstName: string
@@ -53,6 +71,20 @@ export class AuthService {
     const response = await apiService.post<UserRegistrationResponse>(this.baseEndpoint, userData)
     
     console.log(`📊 [AUTH] Resposta do cadastro:`, response)
+    return response
+  }
+
+  /**
+   * Cadastra um usuário externo (Google, Facebook, etc.)
+   */
+  async registerExternalUser(userData: ExternalUserRegistrationData): Promise<ApiResponse<ExternalUserRegistrationResponse>> {
+    console.log(`👤 [AUTH] Iniciando cadastro de usuário externo`)
+    console.log(`📝 [AUTH] Dados do usuário externo:`, userData)
+    console.log(`🔗 [AUTH] Endpoint: ${environment.endpoints.auth.external}`)
+    
+    const response = await apiService.post<ExternalUserRegistrationResponse>(environment.endpoints.auth.external, userData)
+    
+    console.log(`📊 [AUTH] Resposta do cadastro externo:`, response)
     return response
   }
 
