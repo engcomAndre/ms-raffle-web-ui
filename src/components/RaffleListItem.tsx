@@ -102,7 +102,16 @@ export function RaffleListItem({
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR', {
+    if (!dateString || dateString === 'Invalid Date') {
+      return 'Data não definida'
+    }
+    
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) {
+      return 'Data não definida'
+    }
+    
+    return date.toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -131,7 +140,9 @@ export function RaffleListItem({
               </div>
               <div>
                 <span className="text-gray-500">Total de números:</span>
-                <p className="font-medium text-gray-900">{raffle.totalNumbers}</p>
+                <p className="font-medium text-gray-900">
+                  {raffle.totalNumbers && !isNaN(raffle.totalNumbers) ? raffle.totalNumbers : 'Não definido'}
+                </p>
               </div>
               <div>
                 <span className="text-gray-500">Criada em:</span>
