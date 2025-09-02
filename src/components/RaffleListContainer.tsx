@@ -18,45 +18,13 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
   const [isLoading, setIsLoading] = useState(true)
 
-  // Carregar dados de paginação
-  useEffect(() => {
-    const loadPaginationData = async () => {
-      try {
-        setIsLoading(true)
-        const response = await raffleService.getMyRafflesWithPagination(currentPage, itemsPerPage)
-        if (response.success && response.data) {
-          setTotalRaffles(response.data.totalElements || 0)
-          setTotalPages(response.data.totalPages || 0)
-        }
-      } catch (error) {
-        console.error('❌ [RAFFLE-CONTAINER] Erro ao carregar dados de paginação:', error)
-        setTotalRaffles(0)
-        setTotalPages(0)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadPaginationData()
-  }, [currentPage, itemsPerPage, searchTerm, statusFilter])
+  // Remover carregamento duplicado - agora o RaffleList gerencia os dados
 
 
 
   const handleRefresh = () => {
-    // Recarregar dados de paginação quando a lista for atualizada
-    const loadPaginationData = async () => {
-      try {
-        const response = await raffleService.getMyRafflesWithPagination(currentPage, itemsPerPage)
-        if (response.success && response.data) {
-          setTotalRaffles(response.data.totalElements || 0)
-          setTotalPages(response.data.totalPages || 0)
-        }
-      } catch (error) {
-        console.error('❌ [RAFFLE-CONTAINER] Erro ao recarregar dados de paginação:', error)
-      }
-    }
-
-    loadPaginationData()
+    // O RaffleList vai recarregar os dados automaticamente
+    console.log('🔄 [RAFFLE-CONTAINER] Refresh solicitado')
   }
 
   const handleItemsPerPageChange = (value: number) => {
@@ -84,6 +52,12 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
     setCurrentPage(0)
   }
 
+  const handleDataChange = (totalRaffles: number, totalPages: number) => {
+    setTotalRaffles(totalRaffles)
+    setTotalPages(totalPages)
+    setIsLoading(false)
+  }
+
   return (
     <div className={`bg-gray-50 rounded-lg shadow-lg border border-gray-200 p-6 space-y-4 ${className}`}>
       {/* Cabeçalho com controles */}
@@ -109,7 +83,8 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
           pageSize={itemsPerPage}
           searchTerm={searchTerm}
           statusFilter={statusFilter}
-          onRefresh={handleRefresh} 
+          onRefresh={handleRefresh}
+          onDataChange={handleDataChange}
         />
       </div>
     </div>
