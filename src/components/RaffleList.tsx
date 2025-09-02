@@ -40,22 +40,23 @@ export function RaffleList({
   const applyFilters = (raffles: RaffleResponse[]) => {
     let filtered = [...raffles]
 
-    // Filtro por termo de busca (título ou prêmio)
+    // Filtro por termo de busca (título, prêmio ou descrição)
     if (searchTerm.trim()) {
       const searchLower = searchTerm.toLowerCase().trim()
       filtered = filtered.filter(raffle => 
         raffle.title?.toLowerCase().includes(searchLower) ||
-        raffle.prize?.toLowerCase().includes(searchLower)
+        raffle.prize?.toLowerCase().includes(searchLower) ||
+        raffle.description?.toLowerCase().includes(searchLower)
       )
     }
 
-    // Filtro por status
+    // Filtro por status (usando a flag active)
     if (statusFilter !== 'all') {
       filtered = filtered.filter(raffle => {
         if (statusFilter === 'active') {
-          return raffle.status === 'ACTIVE'
+          return raffle.active === true
         } else if (statusFilter === 'inactive') {
-          return raffle.status === 'INACTIVE' || raffle.status === 'COMPLETED' || raffle.status === 'CANCELLED'
+          return raffle.active === false
         }
         return true
       })

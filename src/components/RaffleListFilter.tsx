@@ -63,7 +63,7 @@ export function RaffleListFilter({
               id="search"
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Título ou prêmio..."
+              placeholder="Título, prêmio ou descrição..."
               className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-48"
               disabled={isLoading}
             />
