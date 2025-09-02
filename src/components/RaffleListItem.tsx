@@ -92,6 +92,9 @@ export function RaffleListItem({
   }
 
   const formatCurrency = (value: number) => {
+    if (isNaN(value) || value === null || value === undefined) {
+      return 'Valor não definido'
+    }
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
