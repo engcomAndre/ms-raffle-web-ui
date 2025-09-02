@@ -53,7 +53,7 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
   }
 
   return (
-    <div className={`space-y-4 ${className}`}>
+    <div className={`bg-gray-50 rounded-lg shadow-lg border border-gray-200 p-6 space-y-4 ${className}`}>
       {/* Cabeçalho com controles */}
       <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
         <div className="flex items-center justify-between">
