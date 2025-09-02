@@ -10,26 +10,7 @@ interface RaffleListProps {
   onRefresh?: () => void
 }
 
-// Componente de ícone de ordenação
-const SortIcon = ({ isActive, order }: { isActive: boolean; order: 'asc' | 'desc' }) => {
-  if (!isActive) {
-    return (
-      <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-      </svg>
-    )
-  }
-  
-  return (
-    <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-      {order === 'asc' ? (
-        <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
-      ) : (
-        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-      )}
-    </svg>
-  )
-}
+
 
 export function RaffleList({ onRefresh }: RaffleListProps) {
   const [raffles, setRaffles] = useState<RaffleResponse[]>([])
@@ -44,12 +25,9 @@ export function RaffleList({ onRefresh }: RaffleListProps) {
   const [hasNext, setHasNext] = useState(false)
   const [hasPrevious, setHasPrevious] = useState(false)
 
-  // Estados de filtros e ordenação
+  // Estados de filtros
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
-  const [sortFields, setSortFields] = useState<Array<{field: string, order: 'asc' | 'desc'}>>([
-    { field: 'createdAt', order: 'desc' }
-  ])
 
   // Estados do modal de edição
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -65,8 +43,7 @@ export function RaffleList({ onRefresh }: RaffleListProps) {
         page: currentPage,
         size: pageSize,
         search: searchTerm,
-        status: statusFilter,
-        sort: sortFields
+        status: statusFilter
       })
 
       const response = await raffleService.getMyRafflesWithPagination(currentPage, pageSize)
@@ -100,33 +77,9 @@ export function RaffleList({ onRefresh }: RaffleListProps) {
   // Carregar rifas quando os parâmetros mudarem
   useEffect(() => {
     loadRaffles()
-  }, [currentPage, pageSize, searchTerm, statusFilter, sortFields])
+  }, [currentPage, pageSize, searchTerm, statusFilter])
 
-  // Função para adicionar/remover ordenação
-  const toggleSort = (field: string) => {
-    setSortFields(prev => {
-      const existing = prev.find(s => s.field === field)
-      if (existing) {
-        if (existing.order === 'asc') {
-          return prev.map(s => s.field === field ? { ...s, order: 'desc' as const } : s)
-        } else {
-          return prev.filter(s => s.field !== field)
-        }
-      } else {
-        return [...prev, { field, order: 'asc' as const }]
-      }
-    })
-  }
 
-  // Função para remover ordenação específica
-  const removeSort = (field: string) => {
-    setSortFields(prev => prev.filter(s => s.field !== field))
-  }
-
-  // Função para limpar todas as ordenações
-  const clearAllSorts = () => {
-    setSortFields([])
-  }
 
   // Handlers para ações das rifas
   const handleEdit = (raffle: RaffleResponse) => {
@@ -193,15 +146,7 @@ export function RaffleList({ onRefresh }: RaffleListProps) {
     // TODO: Implementar modal de visualização de números
   }
 
-  // Campos disponíveis para ordenação
-  const sortableFields = [
-    { key: 'title', label: 'Título' },
-    { key: 'price', label: 'Preço' },
-    { key: 'totalNumbers', label: 'Total de Números' },
-    { key: 'active', label: 'Status' },
-    { key: 'createdAt', label: 'Data de Criação' },
-    { key: 'updatedAt', label: 'Data de Atualização' }
-  ]
+
 
   if (isLoading) {
     return (
@@ -298,78 +243,7 @@ export function RaffleList({ onRefresh }: RaffleListProps) {
         </div>
       </div>
 
-      {/* Ordenação */}
-      <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <span className="text-sm font-medium text-gray-700">Ordenar por:</span>
-            <div className="flex flex-wrap gap-2">
-              {sortableFields.map((field) => {
-                const sortField = sortFields.find(s => s.field === field.key)
-                return (
-                  <button
-                    key={field.key}
-                    onClick={() => toggleSort(field.key)}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border transition-colors"
-                    style={{
-                      backgroundColor: sortField ? '#dbeafe' : 'white',
-                      borderColor: sortField ? '#3b82f6' : '#d1d5db',
-                      color: sortField ? '#1e40af' : '#6b7280'
-                    }}
-                  >
-                    {field.label}
-                    <SortIcon isActive={!!sortField} order={sortField?.order || 'asc'} />
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-          
-          <div className="ml-auto flex items-center space-x-2">
-            <span className="text-sm text-gray-500">
-              {raffles.length} rifa{raffles.length !== 1 ? 's' : ''} encontrada{raffles.length !== 1 ? 's' : ''}
-            </span>
-            {sortFields.length > 0 && (
-              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
-                {sortFields.length} ordenação{sortFields.length !== 1 ? 'ões' : 'ão'}
-              </span>
-            )}
-          </div>
-        </div>
 
-        {/* Ordenações ativas */}
-        {sortFields.length > 0 && (
-          <div className="border-t pt-4 mt-4">
-            <div className="flex items-center justify-between">
-              <div className="flex flex-wrap gap-2">
-                {sortFields.map((sort) => (
-                  <span
-                    key={sort.field}
-                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                  >
-                    {sortableFields.find(f => f.key === sort.field)?.label} ({sort.order === 'asc' ? 'A-Z' : 'Z-A'})
-                    <button
-                      onClick={() => removeSort(sort.field)}
-                      className="ml-1 text-blue-600 hover:text-blue-800"
-                      title="Remover ordenação"
-                    >
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                    </button>
-                  </span>
-                ))}
-              </div>
-              <button
-                onClick={clearAllSorts}
-                className="text-xs text-gray-500 hover:text-gray-700"
-              >
-                Limpar todas
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
 
       {/* Lista de Rifas */}
       <div className="space-y-4">
