@@ -12,6 +12,7 @@ export interface RaffleResponse {
   id: string
   title: string
   prize: string
+  description?: string
   maxNumbers: number
   files: string[]
   startAt: string
@@ -19,6 +20,7 @@ export interface RaffleResponse {
   createdAt: string
   updatedAt: string
   status: 'ACTIVE' | 'INACTIVE' | 'COMPLETED' | 'CANCELLED'
+  active: boolean
   soldNumbers: number
   createdBy: string
   numbersCreated: number
