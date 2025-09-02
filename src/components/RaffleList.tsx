@@ -20,14 +20,8 @@ export function RaffleList({ onRefresh }: RaffleListProps) {
   // Estados de paginação
   const [currentPage, setCurrentPage] = useState(0)
   const [pageSize, setPageSize] = useState(10)
-  const [totalElements, setTotalElements] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [hasNext, setHasNext] = useState(false)
-  const [hasPrevious, setHasPrevious] = useState(false)
 
-  // Estados de filtros
-  const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
+
 
   // Estados do modal de edição
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -41,9 +35,7 @@ export function RaffleList({ onRefresh }: RaffleListProps) {
       
       console.log('🔄 [RAFFLE-LIST] Carregando rifas...', {
         page: currentPage,
-        size: pageSize,
-        search: searchTerm,
-        status: statusFilter
+        size: pageSize
       })
 
       const response = await raffleService.getMyRafflesWithPagination(currentPage, pageSize)
@@ -51,10 +43,6 @@ export function RaffleList({ onRefresh }: RaffleListProps) {
       if (response.success && response.data) {
         const data = response.data as RafflePageResponse
         setRaffles(data.content || [])
-        setTotalElements(data.totalElements || 0)
-        setTotalPages(data.totalPages || 0)
-        setHasNext(data.hasNext || false)
-        setHasPrevious(data.hasPrevious || false)
         
         console.log('✅ [RAFFLE-LIST] Rifas carregadas:', {
           total: data.totalElements,
@@ -77,7 +65,7 @@ export function RaffleList({ onRefresh }: RaffleListProps) {
   // Carregar rifas quando os parâmetros mudarem
   useEffect(() => {
     loadRaffles()
-  }, [currentPage, pageSize, searchTerm, statusFilter])
+  }, [currentPage, pageSize])
 
 
 
@@ -180,71 +168,7 @@ export function RaffleList({ onRefresh }: RaffleListProps) {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Filtros e Busca */}
-      <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-          {/* Busca */}
-          <div className="flex-1 max-w-md">
-            <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
-              Buscar rifas
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                id="search"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Digite o título da rifa..."
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-              />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          {/* Filtro de Status */}
-          <div className="lg:ml-4">
-            <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
-              Status
-            </label>
-            <select
-              id="status"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="all">Todas</option>
-              <option value="active">Ativas</option>
-              <option value="inactive">Inativas</option>
-            </select>
-          </div>
-
-          {/* Tamanho da página */}
-          <div className="lg:ml-4">
-            <label htmlFor="pageSize" className="block text-sm font-medium text-gray-700 mb-2">
-              Itens por página
-            </label>
-            <select
-              id="pageSize"
-              value={pageSize}
-              onChange={(e) => setPageSize(Number(e.target.value))}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-
-
+    <div className="p-6">
       {/* Lista de Rifas */}
       <div className="space-y-4">
         {raffles.length === 0 ? (
@@ -269,83 +193,7 @@ export function RaffleList({ onRefresh }: RaffleListProps) {
         )}
       </div>
 
-      {/* Paginação */}
-      {totalPages > 1 && (
-        <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 rounded-lg border border-gray-200 shadow-sm">
-          <div className="flex-1 flex justify-between sm:hidden">
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
-              disabled={!hasPrevious}
-              className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Anterior
-            </button>
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
-              disabled={!hasNext}
-              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Próximo
-            </button>
-          </div>
-          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm text-gray-700">
-                Mostrando <span className="font-medium">{currentPage * pageSize + 1}</span> até{' '}
-                <span className="font-medium">
-                  {Math.min((currentPage + 1) * pageSize, totalElements)}
-                </span>{' '}
-                de <span className="font-medium">{totalElements}</span> resultados
-              </p>
-            </div>
-            <div>
-              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                <button
-                  onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
-                  disabled={!hasPrevious}
-                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <span className="sr-only">Anterior</span>
-                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                </button>
-                
-                {/* Páginas */}
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  const page = i + Math.max(0, currentPage - 2)
-                  if (page >= totalPages) return null
-                  
-                  return (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                        page === currentPage
-                          ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                          : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                      }`}
-                    >
-                      {page + 1}
-                    </button>
-                  )
-                })}
-                
-                <button
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
-                  disabled={!hasNext}
-                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <span className="sr-only">Próximo</span>
-                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                  </svg>
-                </button>
-              </nav>
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* Modal de Edição */}
       <RaffleEditModal
