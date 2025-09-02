@@ -1,0 +1,1 @@
+Esta é uma correção de teste para verificar se há problemas de codificação na palavra "ordenação".
