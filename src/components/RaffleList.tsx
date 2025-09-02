@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { raffleService } from '@/services/raffleService'
 import { RaffleResponse, RafflePageResponse } from '@/types/raffle'
 import { RaffleListItem } from './RaffleListItem'
+import { RaffleEditModal } from './RaffleEditModal'
 
 interface RaffleListProps {
   onRefresh?: () => void
@@ -49,6 +50,10 @@ export function RaffleList({ onRefresh }: RaffleListProps) {
   const [sortFields, setSortFields] = useState<Array<{field: string, order: 'asc' | 'desc'}>>([
     { field: 'createdAt', order: 'desc' }
   ])
+
+  // Estados do modal de edição
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [raffleToEdit, setRaffleToEdit] = useState<RaffleResponse | null>(null)
 
   // Carregar rifas com paginação, filtros e ordenação
   const loadRaffles = async () => {
@@ -126,7 +131,19 @@ export function RaffleList({ onRefresh }: RaffleListProps) {
   // Handlers para ações das rifas
   const handleEdit = (raffle: RaffleResponse) => {
     console.log('✏️ [RAFFLE-LIST] Editando rifa:', raffle.id)
-    // TODO: Implementar modal de edição
+    setRaffleToEdit(raffle)
+    setIsEditModalOpen(true)
+  }
+
+  const handleEditModalClose = () => {
+    setIsEditModalOpen(false)
+    setRaffleToEdit(null)
+  }
+
+  const handleEditSuccess = () => {
+    console.log('✅ [RAFFLE-LIST] Rifa editada com sucesso, recarregando lista')
+    loadRaffles()
+    onRefresh?.()
   }
 
   const handleDelete = async (raffleId: string) => {
@@ -455,6 +472,14 @@ export function RaffleList({ onRefresh }: RaffleListProps) {
           </div>
         </div>
       )}
+
+      {/* Modal de Edição */}
+      <RaffleEditModal
+        isOpen={isEditModalOpen}
+        onClose={handleEditModalClose}
+        raffle={raffleToEdit}
+        onSuccess={handleEditSuccess}
+      />
     </div>
   )
 }
