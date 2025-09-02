@@ -15,26 +15,30 @@ export class ApiService {
     this.baseURL = baseURL || environment.apiBaseUrl
   }
 
-  private getAuthHeaders(): Record<string, string> {
-    // Primeiro tentar pegar o token do auth store
-    let token = useAuthStore.getState().token
-    console.log('🔍 [API] Token do auth store:', token ? 'encontrado' : 'não encontrado')
-    
-    // Se não encontrar no auth store, tentar localStorage como fallback
-    if (!token) {
-      token = typeof window !== 'undefined' ? localStorage.getItem('auth-token') : null
-      console.log('🔍 [API] Token do localStorage:', token ? 'encontrado' : 'não encontrado')
-    }
-    
+  private getAuthHeaders(includeAuth: boolean = true): Record<string, string> {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     }
     
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`
-      console.log('🔐 [API] Token de autenticação incluído nos headers')
+    if (includeAuth) {
+      // Primeiro tentar pegar o token do auth store
+      let token = useAuthStore.getState().token
+      console.log('🔍 [API] Token do auth store:', token ? 'encontrado' : 'não encontrado')
+      
+      // Se não encontrar no auth store, tentar localStorage como fallback
+      if (!token) {
+        token = typeof window !== 'undefined' ? localStorage.getItem('auth-token') : null
+        console.log('🔍 [API] Token do localStorage:', token ? 'encontrado' : 'não encontrado')
+      }
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+        console.log('🔐 [API] Token de autenticação incluído nos headers')
+      } else {
+        console.log('⚠️ [API] Nenhum token de autenticação encontrado')
+      }
     } else {
-      console.log('⚠️ [API] Nenhum token de autenticação encontrado')
+      console.log('🔓 [API] Requisição sem autenticação (login/register)')
     }
     
     return headers
@@ -69,16 +73,32 @@ export class ApiService {
     return this.request<T>(endpoint, { method: 'DELETE' })
   }
 
+  // Métodos específicos para autenticação (sem token)
+  async login<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }, false) // Sem autenticação
+  }
+
+  async register<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }, false) // Sem autenticação
+  }
+
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    includeAuth: boolean = true
   ): Promise<ApiResponse<T>> {
     try {
       const url = `${this.baseURL}${endpoint}`
       console.log(`🚀 [API] Fazendo requisição para: ${url}`)
       console.log(`📋 [API] Método: ${options.method || 'GET'}`)
       
-      const authHeaders = this.getAuthHeaders()
+      const authHeaders = this.getAuthHeaders(includeAuth)
       const config: RequestInit = {
         ...options,
         headers: {
