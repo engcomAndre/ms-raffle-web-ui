@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { DashboardLayout } from '@/components/DashboardLayout'
-import { RaffleList } from '@/components/RaffleList'
+import { RaffleListContainer } from '@/components/RaffleListContainer'
 
 export default function PlaygroundPage() {
   const router = useRouter()
@@ -56,7 +56,7 @@ export default function PlaygroundPage() {
       </div>
 
       {/* Lista de Rifas */}
-      <RaffleList />
+      <RaffleListContainer />
     </DashboardLayout>
   )
 }
