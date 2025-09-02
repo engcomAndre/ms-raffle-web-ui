@@ -3,6 +3,9 @@ export const environment = {
   // URL base da API do ms-auth-core-service
   apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080',
   
+  // URL base da API do ms-raffle-management-service
+  raffleApiBaseUrl: process.env.NEXT_PUBLIC_RAFFLE_API_BASE_URL || 'http://localhost:8081',
+  
   // Configurações da aplicação
   appName: process.env.NEXT_PUBLIC_APP_NAME || 'MS Raffle',
   appVersion: process.env.NEXT_PUBLIC_APP_VERSION || '0.1.0',

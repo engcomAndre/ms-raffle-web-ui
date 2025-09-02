@@ -68,7 +68,7 @@ export class AuthService {
     console.log(`📝 [AUTH] Dados do usuário:`, userData)
     console.log(`🔗 [AUTH] Endpoint: ${this.baseEndpoint}`)
     
-    const response = await apiService.post<UserRegistrationResponse>(this.baseEndpoint, userData)
+    const response = await apiService.register<UserRegistrationResponse>(this.baseEndpoint, userData)
     
     console.log(`📊 [AUTH] Resposta do cadastro:`, response)
     return response
@@ -82,7 +82,7 @@ export class AuthService {
     console.log(`📝 [AUTH] Dados do usuário externo:`, userData)
     console.log(`🔗 [AUTH] Endpoint: ${environment.endpoints.auth.external}`)
     
-    const response = await apiService.post<ExternalUserRegistrationResponse>(environment.endpoints.auth.external, userData)
+    const response = await apiService.register<ExternalUserRegistrationResponse>(environment.endpoints.auth.external, userData)
     
     console.log(`📊 [AUTH] Resposta do cadastro externo:`, response)
     return response
@@ -96,7 +96,7 @@ export class AuthService {
     console.log(`📝 [AUTH] Dados do login:`, loginData)
     console.log(`🔗 [AUTH] Endpoint: ${environment.endpoints.auth.login}`)
     
-    const response = await apiService.post<LoginResponse>(environment.endpoints.auth.login, loginData)
+    const response = await apiService.login<LoginResponse>(environment.endpoints.auth.login, loginData)
     
     console.log(`📊 [AUTH] Resposta do login:`, response)
     return response
@@ -106,8 +106,11 @@ export class AuthService {
    * Verifica se o usuário está autenticado
    */
   async verifyToken(token: string): Promise<ApiResponse<any>> {
-    return apiService.get(`${this.baseEndpoint}/verify`, {
+    // Usar o método request diretamente com headers customizados
+    return (apiService as any).request(`${this.baseEndpoint}/verify`, {
+      method: 'GET',
       headers: {
+        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       }
     })
