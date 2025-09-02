@@ -7,19 +7,19 @@ import { RaffleListItem } from './RaffleListItem'
 import { RaffleEditModal } from './RaffleEditModal'
 
 interface RaffleListProps {
+  currentPage?: number
+  pageSize?: number
   onRefresh?: () => void
 }
 
 
 
-export function RaffleList({ onRefresh }: RaffleListProps) {
+export function RaffleList({ currentPage = 0, pageSize = 10, onRefresh }: RaffleListProps) {
   const [raffles, setRaffles] = useState<RaffleResponse[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   
-  // Estados de paginação
-  const [currentPage, setCurrentPage] = useState(0)
-  const [pageSize, setPageSize] = useState(10)
+  // Estados de paginação (removidos pois agora vem via props)
 
 
 

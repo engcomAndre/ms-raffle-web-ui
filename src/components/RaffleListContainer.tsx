@@ -12,48 +12,58 @@ interface RaffleListContainerProps {
 export function RaffleListContainer({ className = '' }: RaffleListContainerProps) {
   const [totalRaffles, setTotalRaffles] = useState(0)
   const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [currentPage, setCurrentPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
 
-  // Carregar total de rifas
+  // Carregar dados de paginação
   useEffect(() => {
-    const loadTotalRaffles = async () => {
+    const loadPaginationData = async () => {
       try {
         setIsLoading(true)
-        const response = await raffleService.getMyRafflesWithPagination(0, 1) // Página 0, tamanho 1 apenas para obter o total
+        const response = await raffleService.getMyRafflesWithPagination(currentPage, itemsPerPage)
         if (response.success && response.data) {
           setTotalRaffles(response.data.totalElements || 0)
+          setTotalPages(response.data.totalPages || 0)
         }
       } catch (error) {
-        console.error('❌ [RAFFLE-CONTAINER] Erro ao carregar total de rifas:', error)
+        console.error('❌ [RAFFLE-CONTAINER] Erro ao carregar dados de paginação:', error)
         setTotalRaffles(0)
+        setTotalPages(0)
       } finally {
         setIsLoading(false)
       }
     }
 
-    loadTotalRaffles()
-  }, [])
+    loadPaginationData()
+  }, [currentPage, itemsPerPage])
 
 
 
   const handleRefresh = () => {
-    // Recarregar total de rifas quando a lista for atualizada
-    const loadTotalRaffles = async () => {
+    // Recarregar dados de paginação quando a lista for atualizada
+    const loadPaginationData = async () => {
       try {
-        const response = await raffleService.getMyRafflesWithPagination(0, 1)
+        const response = await raffleService.getMyRafflesWithPagination(currentPage, itemsPerPage)
         if (response.success && response.data) {
           setTotalRaffles(response.data.totalElements || 0)
+          setTotalPages(response.data.totalPages || 0)
         }
       } catch (error) {
-        console.error('❌ [RAFFLE-CONTAINER] Erro ao recarregar total de rifas:', error)
+        console.error('❌ [RAFFLE-CONTAINER] Erro ao recarregar dados de paginação:', error)
       }
     }
 
-    loadTotalRaffles()
+    loadPaginationData()
   }
 
   const handleItemsPerPageChange = (value: number) => {
     setItemsPerPage(value)
+    setCurrentPage(0) // Reset para primeira página quando mudar itens por página
+  }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
   }
 
   return (
@@ -62,14 +72,23 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
       <RaffleListControls
         totalRaffles={totalRaffles}
         itemsPerPage={itemsPerPage}
+        currentPage={currentPage}
+        totalPages={totalPages}
         onItemsPerPageChange={handleItemsPerPageChange}
+        onPageChange={handlePageChange}
         isLoading={isLoading}
       />
 
       {/* Lista de rifas */}
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-        <RaffleList onRefresh={handleRefresh} />
+        <RaffleList 
+          currentPage={currentPage}
+          pageSize={itemsPerPage}
+          onRefresh={handleRefresh} 
+        />
       </div>
     </div>
   )
 }
+
+
