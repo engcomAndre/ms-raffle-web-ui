@@ -14,6 +14,8 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [currentPage, setCurrentPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
   const [isLoading, setIsLoading] = useState(true)
 
   // Carregar dados de paginação
@@ -36,7 +38,7 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
     }
 
     loadPaginationData()
-  }, [currentPage, itemsPerPage])
+  }, [currentPage, itemsPerPage, searchTerm, statusFilter])
 
 
 
@@ -66,6 +68,16 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
     setCurrentPage(page)
   }
 
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value)
+    setCurrentPage(0) // Reset para primeira página ao buscar
+  }
+
+  const handleStatusFilterChange = (value: string) => {
+    setStatusFilter(value)
+    setCurrentPage(0) // Reset para primeira página ao filtrar
+  }
+
   return (
     <div className={`bg-gray-50 rounded-lg shadow-lg border border-gray-200 p-6 space-y-4 ${className}`}>
       {/* Cabeçalho com controles */}
@@ -74,8 +86,12 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
         itemsPerPage={itemsPerPage}
         currentPage={currentPage}
         totalPages={totalPages}
+        searchTerm={searchTerm}
+        statusFilter={statusFilter}
         onItemsPerPageChange={handleItemsPerPageChange}
         onPageChange={handlePageChange}
+        onSearchChange={handleSearchChange}
+        onStatusFilterChange={handleStatusFilterChange}
         isLoading={isLoading}
       />
 
@@ -90,5 +106,7 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
     </div>
   )
 }
+
+
 
 
