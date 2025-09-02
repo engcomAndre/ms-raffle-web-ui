@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { RaffleList } from './RaffleList'
 import { RaffleListControls } from './RaffleListControls'
-import { FilterOptions } from './RaffleListFilters'
 import { raffleService } from '@/services/raffleService'
 
 interface RaffleListContainerProps {
@@ -15,15 +14,9 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [currentPage, setCurrentPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
   const [isLoading, setIsLoading] = useState(true)
-  
-  // Estados dos filtros
-  const [filters, setFilters] = useState<FilterOptions>({
-    searchTerm: '',
-    statusFilter: 'all',
-    sortBy: 'createdAt',
-    sortOrder: 'desc'
-  })
 
   // Carregar dados de paginação
   useEffect(() => {
@@ -45,7 +38,7 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
     }
 
     loadPaginationData()
-  }, [currentPage, itemsPerPage, filters])
+  }, [currentPage, itemsPerPage, searchTerm, statusFilter])
 
 
 
@@ -75,18 +68,19 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
     setCurrentPage(page)
   }
 
-  const handleFiltersChange = (newFilters: FilterOptions) => {
-    setFilters(newFilters)
-    setCurrentPage(0) // Reset para primeira página quando mudar filtros
+  const handleSearchChange = (search: string) => {
+    setSearchTerm(search)
+    setCurrentPage(0) // Reset para primeira página quando filtrar
+  }
+
+  const handleStatusFilterChange = (status: 'all' | 'active' | 'inactive') => {
+    setStatusFilter(status)
+    setCurrentPage(0) // Reset para primeira página quando filtrar
   }
 
   const handleClearFilters = () => {
-    setFilters({
-      searchTerm: '',
-      statusFilter: 'all',
-      sortBy: 'createdAt',
-      sortOrder: 'desc'
-    })
+    setSearchTerm('')
+    setStatusFilter('all')
     setCurrentPage(0)
   }
 
@@ -98,10 +92,12 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
         itemsPerPage={itemsPerPage}
         currentPage={currentPage}
         totalPages={totalPages}
-        filters={filters}
+        searchTerm={searchTerm}
+        statusFilter={statusFilter}
         onItemsPerPageChange={handleItemsPerPageChange}
         onPageChange={handlePageChange}
-        onFiltersChange={handleFiltersChange}
+        onSearchChange={handleSearchChange}
+        onStatusFilterChange={handleStatusFilterChange}
         onClearFilters={handleClearFilters}
         isLoading={isLoading}
       />
@@ -111,13 +107,14 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
         <RaffleList 
           currentPage={currentPage}
           pageSize={itemsPerPage}
+          searchTerm={searchTerm}
+          statusFilter={statusFilter}
           onRefresh={handleRefresh} 
         />
       </div>
     </div>
   )
 }
-
 
 
 

@@ -9,19 +9,25 @@ import { RaffleEditModal } from './RaffleEditModal'
 interface RaffleListProps {
   currentPage?: number
   pageSize?: number
+  searchTerm?: string
+  statusFilter?: 'all' | 'active' | 'inactive'
   onRefresh?: () => void
 }
 
 
 
-export function RaffleList({ currentPage = 0, pageSize = 10, onRefresh }: RaffleListProps) {
+export function RaffleList({ 
+  currentPage = 0, 
+  pageSize = 10, 
+  searchTerm = '', 
+  statusFilter = 'all', 
+  onRefresh 
+}: RaffleListProps) {
   const [raffles, setRaffles] = useState<RaffleResponse[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   
-  // Estados de paginação (removidos pois agora vem via props)
-
-
+  // Estados internos removidos - agora vêm via props
 
   // Estados do modal de edição
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -35,7 +41,9 @@ export function RaffleList({ currentPage = 0, pageSize = 10, onRefresh }: Raffle
       
       console.log('🔄 [RAFFLE-LIST] Carregando rifas...', {
         page: currentPage,
-        size: pageSize
+        size: pageSize,
+        search: searchTerm,
+        status: statusFilter
       })
 
       const response = await raffleService.getMyRafflesWithPagination(currentPage, pageSize)
@@ -65,7 +73,7 @@ export function RaffleList({ currentPage = 0, pageSize = 10, onRefresh }: Raffle
   // Carregar rifas quando os parâmetros mudarem
   useEffect(() => {
     loadRaffles()
-  }, [currentPage, pageSize])
+  }, [currentPage, pageSize, searchTerm, statusFilter])
 
 
 
@@ -168,7 +176,11 @@ export function RaffleList({ currentPage = 0, pageSize = 10, onRefresh }: Raffle
   }
 
   return (
-    <div className="p-6">
+    <div className="space-y-6">
+
+
+
+
       {/* Lista de Rifas */}
       <div className="space-y-4">
         {raffles.length === 0 ? (
