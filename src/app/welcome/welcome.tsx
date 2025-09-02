@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { UserPassLoginService } from '@/services/userPassLoginService'
 import { GoogleLoginService } from '@/services/googleLoginService'
-import { UserRegistrationData } from '@/services/authService'
+import { UserRegistrationData, AuthService } from '@/services/authService'
 import { GoogleLoginSection } from '@/components/GoogleLoginSection'
 
 export default function WelcomePage() {
@@ -15,9 +15,6 @@ export default function WelcomePage() {
   // Instanciar os serviços
   const userPassLoginService = new UserPassLoginService()
   const googleLoginService = new GoogleLoginService()
-  
-  // Importar AuthService para cadastro
-  const { AuthService } = require('@/services/authService')
   const authService = new AuthService()
   
   // Verificação de autenticação usando useEffect
@@ -39,8 +36,8 @@ export default function WelcomePage() {
   }, [shouldRedirect])
   
   // Estados para login
-  const [loginUsername, setLoginUsername] = useState('')
-  const [loginPassword, setLoginPassword] = useState('')
+  const [loginUsername, setLoginUsername] = useState('andre')
+  const [loginPassword, setLoginPassword] = useState('123456')
   const [isLoginLoading, setIsLoginLoading] = useState(false)
   const [loginError, setLoginError] = useState('')
 
@@ -324,7 +321,7 @@ export default function WelcomePage() {
           <div className="mt-8 p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600 mb-2">Credenciais de teste:</p>
             <p className="text-sm"><strong>Username:</strong> admin</p>
-            <p className="text-sm"><strong>Senha:</strong> admin123</p>
+                            <p className="text-sm"><strong>Senha:</strong> 123456</p>
           </div>
         </div>
 

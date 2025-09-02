@@ -1,3 +1,6 @@
+import { useAuthStore } from '../stores/authStore'
+import { environment } from '../config/environment'
+
 export interface ApiResponse<T> {
   success: boolean
   data?: T
@@ -9,7 +12,32 @@ export class ApiService {
   private baseURL: string
 
   constructor(baseURL?: string) {
-    this.baseURL = baseURL || 'http://localhost:8080'
+    this.baseURL = baseURL || environment.apiBaseUrl
+  }
+
+  private getAuthHeaders(): Record<string, string> {
+    // Primeiro tentar pegar o token do auth store
+    let token = useAuthStore.getState().token
+    console.log('🔍 [API] Token do auth store:', token ? 'encontrado' : 'não encontrado')
+    
+    // Se não encontrar no auth store, tentar localStorage como fallback
+    if (!token) {
+      token = typeof window !== 'undefined' ? localStorage.getItem('auth-token') : null
+      console.log('🔍 [API] Token do localStorage:', token ? 'encontrado' : 'não encontrado')
+    }
+    
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    }
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+      console.log('🔐 [API] Token de autenticação incluído nos headers')
+    } else {
+      console.log('⚠️ [API] Nenhum token de autenticação encontrado')
+    }
+    
+    return headers
   }
 
   async get<T>(endpoint: string): Promise<ApiResponse<T>> {
@@ -19,9 +47,6 @@ export class ApiService {
   async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify(data),
     })
   }
@@ -29,9 +54,13 @@ export class ApiService {
   async put<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      body: JSON.stringify(data),
+    })
+  }
+
+  async patch<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'PATCH',
       body: JSON.stringify(data),
     })
   }
@@ -48,32 +77,48 @@ export class ApiService {
       const url = `${this.baseURL}${endpoint}`
       console.log(`🚀 [API] Fazendo requisição para: ${url}`)
       console.log(`📋 [API] Método: ${options.method || 'GET'}`)
-      console.log(`📦 [API] Headers:`, options.headers)
-      if (options.body) {
-        console.log(`📤 [API] Body:`, options.body)
-      }
-
+      
+      const authHeaders = this.getAuthHeaders()
       const config: RequestInit = {
         ...options,
         headers: {
-          'Content-Type': 'application/json',
+          ...authHeaders,
           ...options.headers,
         },
+      }
+      
+      console.log(`📦 [API] Headers:`, config.headers)
+      if (options.body) {
+        console.log(`📤 [API] Body:`, options.body)
       }
 
       console.log(`⏳ [API] Aguardando resposta...`)
       const response = await fetch(url, config)
       console.log(`📥 [API] Resposta recebida - Status: ${response.status} ${response.statusText}`)
 
-      const data = await response.json()
-      console.log(`📄 [API] Dados da resposta:`, data)
+      // Verificar se a resposta tem conteúdo antes de tentar fazer JSON
+      const contentType = response.headers.get('content-type')
+      const hasContent = contentType && contentType.includes('application/json')
+      
+      let data: any = null
+      if (hasContent && response.status !== 204) {
+        try {
+          data = await response.json()
+          console.log(`📄 [API] Dados da resposta:`, data)
+        } catch (jsonError) {
+          console.log(`⚠️ [API] Erro ao fazer parse do JSON:`, jsonError)
+          data = null
+        }
+      } else {
+        console.log(`📄 [API] Resposta sem conteúdo JSON (status: ${response.status})`)
+      }
 
       if (!response.ok) {
         console.log(`❌ [API] Erro na resposta: ${response.status}`)
         return {
           success: false,
           error: `HTTP error! status: ${response.status}`,
-          message: data.message || data.detail || 'Erro na requisição',
+          message: data?.message || data?.detail || 'Erro na requisição',
         }
       }
 
@@ -81,7 +126,7 @@ export class ApiService {
       return {
         success: true,
         data,
-        message: data.message,
+        message: data?.message,
       }
     } catch (error) {
       console.log(`💥 [API] Erro durante a requisição:`, error)
