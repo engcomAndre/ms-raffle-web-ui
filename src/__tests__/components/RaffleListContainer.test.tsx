@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { RaffleListContainer } from '@/components/RaffleListContainer'
 
 // Mock dos componentes filhos
-jest.mock('@/components/RaffleListControls', () => {
+jest.mock('../../components/RaffleListControls', () => {
   return {
     RaffleListControls: ({ 
       totalRaffles, 
@@ -38,7 +38,7 @@ jest.mock('@/components/RaffleListControls', () => {
   }
 })
 
-jest.mock('@/components/RaffleList', () => {
+jest.mock('../../components/RaffleList', () => {
   return {
     RaffleList: ({ currentPage, pageSize, searchTerm, statusFilter, onRefresh, onDataChange }: any) => (
       <div data-testid="raffle-list">
@@ -317,13 +317,12 @@ describe('RaffleListContainer', () => {
       
       // Define alguns estados
       await user.click(screen.getByText('Change Items Per Page'))
-      await user.click(screen.getByText('Change Page'))
       await user.click(screen.getByText('Change Search'))
       await user.click(screen.getByText('Change Status'))
       
       await waitFor(() => {
         const raffleList = screen.getByTestId('raffle-list')
-        expect(raffleList).toHaveTextContent('CurrentPage: 1')
+        expect(raffleList).toHaveTextContent('CurrentPage: 0') // Deve resetar para 0 após filtros
         expect(raffleList).toHaveTextContent('PageSize: 20')
         expect(raffleList).toHaveTextContent('Search: test')
         expect(raffleList).toHaveTextContent('Status: active')

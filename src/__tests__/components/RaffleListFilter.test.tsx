@@ -92,9 +92,8 @@ describe('RaffleListFilter', () => {
       
       const searchInput = screen.getByPlaceholderText(/título, prêmio ou descrição/i)
       
-      // Usar clear + type para simular entrada completa
-      await user.clear(searchInput)
-      await user.type(searchInput, 'test')
+      // Usar fireEvent.change para simular mudança de valor
+      fireEvent.change(searchInput, { target: { value: 'test' } })
       
       // Verificar que onSearchChange foi chamado com o texto
       expect(mockProps.onSearchChange).toHaveBeenCalledWith('test')

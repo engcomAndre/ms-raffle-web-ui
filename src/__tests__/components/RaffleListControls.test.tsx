@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { RaffleListControls } from '@/components/RaffleListControls'
 
 // Mock dos componentes filhos
-jest.mock('@/components/RaffleListFilter', () => {
+jest.mock('../../components/RaffleListFilter', () => {
   return {
     RaffleListFilter: ({ searchTerm, statusFilter, onSearchChange, onStatusFilterChange, onClearFilters, isLoading }: any) => (
       <div data-testid="raffle-list-filter">
@@ -19,7 +19,7 @@ jest.mock('@/components/RaffleListFilter', () => {
   }
 })
 
-jest.mock('@/components/RaffleListPagination', () => {
+jest.mock('../../components/RaffleListPagination', () => {
   return {
     RaffleListPagination: ({ totalRaffles, itemsPerPage, currentPage, totalPages, onItemsPerPageChange, onPageChange, isLoading }: any) => (
       <div data-testid="raffle-list-pagination">
@@ -74,7 +74,9 @@ describe('RaffleListControls', () => {
     it('deve ter layout flex com justify-between', () => {
       render(<RaffleListControls {...mockProps} />)
       
-      const flexContainer = screen.getByTestId('raffle-list-filter').closest('.flex')
+      // O container principal deve ter as classes corretas
+      const mainContainer = screen.getByTestId('raffle-list-filter').closest('.bg-white')
+      const flexContainer = mainContainer?.querySelector('.flex')
       expect(flexContainer).toBeInTheDocument()
       expect(flexContainer).toHaveClass('flex', 'items-center', 'justify-between', 'gap-4')
     })

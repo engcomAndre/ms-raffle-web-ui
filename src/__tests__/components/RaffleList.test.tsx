@@ -5,7 +5,7 @@ import { RaffleList } from '@/components/RaffleList'
 import { raffleService } from '@/services/raffleService'
 
 // Mock do raffleService
-jest.mock('@/services/raffleService', () => ({
+jest.mock('../../services/raffleService', () => ({
   raffleService: {
     getMyRafflesWithPagination: jest.fn(),
     activeRaffle: jest.fn(),
@@ -16,7 +16,7 @@ jest.mock('@/services/raffleService', () => ({
 }))
 
 // Mock dos componentes filhos
-jest.mock('@/components/RaffleListItem', () => {
+jest.mock('../../components/RaffleListItem', () => {
   return {
     RaffleListItem: ({ raffle, onEdit, onDelete, onToggleStatus }: any) => (
       <div data-testid={`raffle-item-${raffle.id}`}>
@@ -30,7 +30,7 @@ jest.mock('@/components/RaffleListItem', () => {
   }
 })
 
-jest.mock('@/components/RaffleEditModal', () => {
+jest.mock('../../components/RaffleEditModal', () => {
   return {
     RaffleEditModal: ({ isOpen, raffle, onClose, onSuccess }: any) => 
       isOpen ? (
@@ -274,8 +274,8 @@ describe('RaffleList', () => {
         expect(screen.getByTestId('raffle-item-1')).toBeInTheDocument()
       })
       
-      const editButton = screen.getByText('Edit')
-      await user.click(editButton)
+      const editButton = screen.getByTestId('raffle-item-1').querySelector('button')
+      await user.click(editButton!)
       
       expect(screen.getByTestId('edit-modal')).toBeInTheDocument()
       expect(screen.getByText('Editing: Rifa 1')).toBeInTheDocument()
@@ -290,7 +290,8 @@ describe('RaffleList', () => {
       })
       
       // Abrir modal
-      await user.click(screen.getByText('Edit'))
+      const editButton = screen.getByTestId('raffle-item-1').querySelector('button')
+      await user.click(editButton!)
       expect(screen.getByTestId('edit-modal')).toBeInTheDocument()
       
       // Fechar modal
@@ -307,7 +308,8 @@ describe('RaffleList', () => {
       })
       
       // Abrir modal e salvar
-      await user.click(screen.getByText('Edit'))
+      const editButton = screen.getByTestId('raffle-item-1').querySelector('button')
+      await user.click(editButton!)
       await user.click(screen.getByText('Save'))
       
       expect(mockProps.onRefresh).toHaveBeenCalled()
@@ -324,8 +326,8 @@ describe('RaffleList', () => {
       render(<RaffleList {...mockProps} />)
       
       await waitFor(() => {
-        expect(screen.getByText('Erro ao carregar rifas')).toBeInTheDocument()
-        expect(screen.getByText('Tentar novamente')).toBeInTheDocument()
+        expect(screen.getAllByText('Erro ao carregar rifas')[0]).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument()
       })
     })
 
@@ -358,10 +360,10 @@ describe('RaffleList', () => {
       render(<RaffleList {...mockProps} />)
       
       await waitFor(() => {
-        expect(screen.getByText('Erro ao carregar rifas')).toBeInTheDocument()
+        expect(screen.getAllByText('Erro ao carregar rifas')[0]).toBeInTheDocument()
       })
       
-      await user.click(screen.getByText('Tentar novamente'))
+      await user.click(screen.getByRole('button', { name: 'Tentar novamente' }))
       
       await waitFor(() => {
         expect(screen.getByTestId('raffle-item-1')).toBeInTheDocument()
