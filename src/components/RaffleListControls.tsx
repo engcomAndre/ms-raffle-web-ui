@@ -23,8 +23,7 @@ export function RaffleListControls({
   const itemsPerPageOptions = [5, 10, 20, 50]
 
   return (
-    <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm space-y-4">
-      {/* Primeira linha: Controles de paginação e total */}
+    <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
       <div className="flex items-center justify-between">
         {/* Itens por página */}
         <div className="flex items-center space-x-2">
@@ -46,6 +45,40 @@ export function RaffleListControls({
           </select>
         </div>
 
+        {/* Navegação de páginas - Centro */}
+        {totalPages > 1 && (
+          <div className="flex items-center space-x-3">
+            {/* Botão página anterior */}
+            <button
+              onClick={() => onPageChange(currentPage - 1)}
+              disabled={currentPage === 0 || isLoading}
+              className="flex items-center justify-center w-8 h-8 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border border-blue-200"
+              title="Página anterior"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            {/* Informação da página atual */}
+            <span className="text-sm font-medium text-gray-700 bg-gray-50 px-3 py-1 rounded-md border border-gray-200">
+              Página {currentPage + 1} de {totalPages}
+            </span>
+
+            {/* Botão próxima página */}
+            <button
+              onClick={() => onPageChange(currentPage + 1)}
+              disabled={currentPage >= totalPages - 1 || isLoading}
+              className="flex items-center justify-center w-8 h-8 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border border-blue-200"
+              title="Próxima página"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        )}
+
         {/* Total de rifas */}
         <div className="flex items-center space-x-2">
           {isLoading ? (
@@ -60,40 +93,6 @@ export function RaffleListControls({
           )}
         </div>
       </div>
-
-      {/* Segunda linha: Navegação de páginas */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center space-x-3 pt-2 border-t border-gray-100">
-          {/* Botão página anterior */}
-          <button
-            onClick={() => onPageChange(currentPage - 1)}
-            disabled={currentPage === 0 || isLoading}
-            className="flex items-center justify-center w-8 h-8 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border border-blue-200"
-            title="Página anterior"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-
-          {/* Informação da página atual */}
-          <span className="text-sm font-medium text-gray-700 bg-gray-50 px-3 py-1 rounded-md border border-gray-200">
-            Página {currentPage + 1} de {totalPages}
-          </span>
-
-          {/* Botão próxima página */}
-          <button
-            onClick={() => onPageChange(currentPage + 1)}
-            disabled={currentPage >= totalPages - 1 || isLoading}
-            className="flex items-center justify-center w-8 h-8 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border border-blue-200"
-            title="Próxima página"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
-      )}
     </div>
   )
 }
