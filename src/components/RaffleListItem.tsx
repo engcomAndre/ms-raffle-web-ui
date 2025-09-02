@@ -135,22 +135,26 @@ export function RaffleListItem({
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
-                <span className="text-gray-500">Preço:</span>
-                <p className="font-medium text-gray-900">{formatCurrency(raffle.price)}</p>
+                <span className="text-gray-500">Prêmio:</span>
+                <p className="font-medium text-gray-900">{raffle.prize || 'Não definido'}</p>
               </div>
               <div>
-                <span className="text-gray-500">Total de números:</span>
+                <span className="text-gray-500">Números criados:</span>
                 <p className="font-medium text-gray-900">
-                  {raffle.totalNumbers && !isNaN(raffle.totalNumbers) ? raffle.totalNumbers : 'Não definido'}
+                  <span className="font-medium">{raffle.numbersCreated || 0}</span>
+                  <div className="text-xs text-gray-500">de {raffle.maxNumbers || 'Não definido'}</div>
+                </p>
+              </div>
+              <div>
+                <span className="text-gray-500">Período:</span>
+                <p className="font-medium text-gray-900">
+                  <div>{formatDate(raffle.startAt)}</div>
+                  <div className="text-xs text-gray-400">até {formatDate(raffle.endAt)}</div>
                 </p>
               </div>
               <div>
                 <span className="text-gray-500">Criada em:</span>
                 <p className="font-medium text-gray-900">{formatDate(raffle.createdAt)}</p>
-              </div>
-              <div>
-                <span className="text-gray-500">Atualizada em:</span>
-                <p className="font-medium text-gray-900">{formatDate(raffle.updatedAt)}</p>
               </div>
             </div>
           </div>
