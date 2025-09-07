@@ -4,173 +4,114 @@ import { RaffleNumberListPagination } from '@/components/RaffleNumberListPaginat
 
 describe('RaffleNumberListPagination', () => {
   const mockOnPageChange = jest.fn()
+  const mockOnItemsPerPageChange = jest.fn()
+
+  const defaultProps = {
+    totalNumbers: 100,
+    itemsPerPage: 20,
+    currentPage: 0,
+    totalPages: 5,
+    onItemsPerPageChange: mockOnItemsPerPageChange,
+    onPageChange: mockOnPageChange,
+    isLoading: false
+  }
 
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
   it('deve renderizar a paginação corretamente', () => {
-    render(
-      <RaffleNumberListPagination
-        currentPage={0}
-        totalPages={5}
-        hasNext={true}
-        hasPrevious={false}
-        onPageChange={mockOnPageChange}
-      />
-    )
+    render(<RaffleNumberListPagination {...defaultProps} />)
     
-    // Verifica se os elementos principais estão presentes
-    expect(screen.getAllByText('1')).toHaveLength(2) // Um no texto da página e outro no botão
-    expect(screen.getByText('2')).toBeInTheDocument()
-    expect(screen.getAllByText('5')).toHaveLength(2) // Um no texto da página e outro no botão
-    expect(screen.getByText('...')).toBeInTheDocument() // Reticências para páginas intermediárias
+    expect(screen.getByText('Total: 100 números')).toBeInTheDocument()
+    expect(screen.getByText('Por página:')).toBeInTheDocument()
+    expect(screen.getByText('Página 1 de 5')).toBeInTheDocument()
   })
 
   it('deve desabilitar botão anterior na primeira página', () => {
-    render(
-      <RaffleNumberListPagination
-        currentPage={0}
-        totalPages={5}
-        hasNext={true}
-        hasPrevious={false}
-        onPageChange={mockOnPageChange}
-      />
-    )
+    render(<RaffleNumberListPagination {...defaultProps} currentPage={0} />)
     
-    const prevButtons = screen.getAllByRole('button', { name: /anterior/i })
-    const desktopPrevButton = prevButtons.find(button => 
-      button.closest('.hidden.sm\\:flex')
-    )
-    expect(desktopPrevButton).toBeDisabled()
+    const prevButton = screen.getByTitle('Página anterior')
+    expect(prevButton).toBeDisabled()
   })
 
   it('deve desabilitar botão próximo na última página', () => {
-    render(
-      <RaffleNumberListPagination
-        currentPage={4}
-        totalPages={5}
-        hasNext={false}
-        hasPrevious={true}
-        onPageChange={mockOnPageChange}
-      />
-    )
+    render(<RaffleNumberListPagination {...defaultProps} currentPage={4} totalPages={5} />)
     
-    const nextButtons = screen.getAllByRole('button', { name: /próximo/i })
-    const desktopNextButton = nextButtons.find(button => 
-      button.closest('.hidden.sm\\:flex')
-    )
-    expect(desktopNextButton).toBeDisabled()
+    const nextButton = screen.getByTitle('Próxima página')
+    expect(nextButton).toBeDisabled()
   })
 
   it('deve chamar onPageChange quando clicar em uma página', () => {
-    render(
-      <RaffleNumberListPagination
-        currentPage={1}
-        totalPages={5}
-        hasNext={true}
-        hasPrevious={true}
-        onPageChange={mockOnPageChange}
-      />
-    )
+    render(<RaffleNumberListPagination {...defaultProps} currentPage={1} />)
     
-    const pageButton = screen.getByText('3')
-    fireEvent.click(pageButton)
+    const nextButton = screen.getByTitle('Próxima página')
+    fireEvent.click(nextButton)
     
     expect(mockOnPageChange).toHaveBeenCalledWith(2)
   })
 
   it('deve chamar onPageChange quando clicar em próximo', () => {
-    render(
-      <RaffleNumberListPagination
-        currentPage={1}
-        totalPages={5}
-        hasNext={true}
-        hasPrevious={true}
-        onPageChange={mockOnPageChange}
-      />
-    )
+    render(<RaffleNumberListPagination {...defaultProps} currentPage={1} />)
     
-    const nextButtons = screen.getAllByRole('button', { name: /próximo/i })
-    const desktopNextButton = nextButtons.find(button => 
-      button.closest('.hidden.sm\\:flex')
-    )
-    fireEvent.click(desktopNextButton!)
+    const nextButton = screen.getByTitle('Próxima página')
+    fireEvent.click(nextButton)
     
     expect(mockOnPageChange).toHaveBeenCalledWith(2)
   })
 
   it('deve chamar onPageChange quando clicar em anterior', () => {
-    render(
-      <RaffleNumberListPagination
-        currentPage={2}
-        totalPages={5}
-        hasNext={true}
-        hasPrevious={true}
-        onPageChange={mockOnPageChange}
-      />
-    )
+    render(<RaffleNumberListPagination {...defaultProps} currentPage={2} />)
     
-    const prevButtons = screen.getAllByRole('button', { name: /anterior/i })
-    const desktopPrevButton = prevButtons.find(button => 
-      button.closest('.hidden.sm\\:flex')
-    )
-    fireEvent.click(desktopPrevButton!)
+    const prevButton = screen.getByTitle('Página anterior')
+    fireEvent.click(prevButton)
     
     expect(mockOnPageChange).toHaveBeenCalledWith(1)
   })
 
-  it('deve destacar a página atual', () => {
-    render(
-      <RaffleNumberListPagination
-        currentPage={2}
-        totalPages={5}
-        hasNext={true}
-        hasPrevious={true}
-        onPageChange={mockOnPageChange}
-      />
-    )
+  it('deve chamar onItemsPerPageChange quando mudar itens por página', () => {
+    render(<RaffleNumberListPagination {...defaultProps} />)
     
-    const currentPageButtons = screen.getAllByText('3')
-    const pageButton = currentPageButtons.find(button => 
-      button.tagName === 'BUTTON' && button.closest('nav')
-    )
-    expect(pageButton).toHaveClass('bg-blue-600', 'text-white')
+    const select = screen.getByDisplayValue('20')
+    fireEvent.change(select, { target: { value: '50' } })
+    
+    expect(mockOnItemsPerPageChange).toHaveBeenCalledWith(50)
   })
 
-  it('deve exibir reticências quando há muitas páginas', () => {
-    render(
-      <RaffleNumberListPagination
-        currentPage={5}
-        totalPages={10}
-        hasNext={true}
-        hasPrevious={true}
-        onPageChange={mockOnPageChange}
-      />
-    )
+  it('deve exibir estado de loading', () => {
+    render(<RaffleNumberListPagination {...defaultProps} isLoading={true} />)
     
-    const dotsButtons = screen.getAllByText('...')
-    expect(dotsButtons.length).toBeGreaterThan(0)
+    expect(screen.getByText('Carregando...')).toBeInTheDocument()
   })
 
-  it('não deve renderizar quando há apenas uma página', () => {
-    const { container } = render(
-      <RaffleNumberListPagination
-        currentPage={0}
-        totalPages={1}
-        hasNext={false}
-        hasPrevious={false}
-        onPageChange={mockOnPageChange}
-      />
-    )
+  it('não deve renderizar navegação quando há apenas uma página', () => {
+    render(<RaffleNumberListPagination {...defaultProps} totalPages={1} />)
     
-    // O componente deve renderizar mas sem botões de navegação funcionais
-    expect(container.firstChild).not.toBeNull()
-    const prevButtons = screen.getAllByRole('button', { name: /anterior/i })
-    const nextButtons = screen.getAllByRole('button', { name: /próximo/i })
+    expect(screen.queryByTitle('Página anterior')).not.toBeInTheDocument()
+    expect(screen.queryByTitle('Próxima página')).not.toBeInTheDocument()
+  })
+
+  it('deve desabilitar controles quando loading', () => {
+    render(<RaffleNumberListPagination {...defaultProps} isLoading={true} />)
     
-    // Todos os botões devem estar desabilitados
-    prevButtons.forEach(button => expect(button).toBeDisabled())
-    nextButtons.forEach(button => expect(button).toBeDisabled())
+    const select = screen.getByDisplayValue('20')
+    const prevButton = screen.getByTitle('Página anterior')
+    const nextButton = screen.getByTitle('Próxima página')
+    
+    expect(select).toBeDisabled()
+    expect(prevButton).toBeDisabled()
+    expect(nextButton).toBeDisabled()
+  })
+
+  it('deve exibir singular para 1 número', () => {
+    render(<RaffleNumberListPagination {...defaultProps} totalNumbers={1} />)
+    
+    expect(screen.getByText('Total: 1 número')).toBeInTheDocument()
+  })
+
+  it('deve exibir plural para múltiplos números', () => {
+    render(<RaffleNumberListPagination {...defaultProps} totalNumbers={5} />)
+    
+    expect(screen.getByText('Total: 5 números')).toBeInTheDocument()
   })
 })

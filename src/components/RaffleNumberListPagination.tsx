@@ -1,118 +1,96 @@
 'use client'
 
 interface RaffleNumberListPaginationProps {
+  totalNumbers: number
+  itemsPerPage: number
   currentPage: number
   totalPages: number
-  hasNext: boolean
-  hasPrevious: boolean
+  onItemsPerPageChange: (value: number) => void
   onPageChange: (page: number) => void
+  isLoading?: boolean
 }
 
 export function RaffleNumberListPagination({
+  totalNumbers,
+  itemsPerPage,
   currentPage,
   totalPages,
-  hasNext,
-  hasPrevious,
-  onPageChange
+  onItemsPerPageChange,
+  onPageChange,
+  isLoading = false
 }: RaffleNumberListPaginationProps) {
-  const getVisiblePages = () => {
-    const delta = 2
-    const range = []
-    const rangeWithDots = []
-
-    for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
-      range.push(i)
-    }
-
-    if (currentPage - delta > 2) {
-      rangeWithDots.push(1, '...')
-    } else {
-      rangeWithDots.push(1)
-    }
-
-    rangeWithDots.push(...range)
-
-    if (currentPage + delta < totalPages - 1) {
-      rangeWithDots.push('...', totalPages)
-    } else if (totalPages > 1) {
-      rangeWithDots.push(totalPages)
-    }
-
-    return rangeWithDots
-  }
-
-  const visiblePages = getVisiblePages()
+  // Opções para itens por página
+  const itemsPerPageOptions = [10, 20, 50, 100]
 
   return (
-    <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
-      <div className="flex flex-1 justify-between sm:hidden">
-        <button
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={!hasPrevious}
-          className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Anterior
-        </button>
-        <button
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={!hasNext}
-          className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Próximo
-        </button>
+    <div className="flex items-center space-x-4">
+      {/* Total de números */}
+      <div className="flex items-center space-x-2">
+        {isLoading ? (
+          <div className="flex items-center space-x-2">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+            <span className="text-sm text-gray-500">Carregando...</span>
+          </div>
+        ) : (
+          <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
+            Total: {totalNumbers} número{totalNumbers !== 1 ? 's' : ''}
+          </span>
+        )}
       </div>
-      
-      <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm text-gray-700">
-            Página <span className="font-medium">{currentPage + 1}</span> de{' '}
-            <span className="font-medium">{totalPages}</span>
-          </p>
-        </div>
-        
-        <div>
-          <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-            <button
-              onClick={() => onPageChange(currentPage - 1)}
-              disabled={!hasPrevious}
-              className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span className="sr-only">Anterior</span>
-              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
-              </svg>
-            </button>
-            
-            {visiblePages.map((page, index) => (
-              <button
-                key={index}
-                onClick={() => typeof page === 'number' && onPageChange(page - 1)}
-                disabled={page === '...'}
-                className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
-                  page === currentPage + 1
-                    ? 'z-10 bg-blue-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
-                    : page === '...'
-                    ? 'text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-default'
-                    : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-            
-            <button
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={!hasNext}
-              className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span className="sr-only">Próximo</span>
-              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
-              </svg>
-            </button>
-          </nav>
-        </div>
+
+      {/* Itens por página */}
+      <div className="flex items-center space-x-2">
+        <label htmlFor="items-per-page" className="text-sm font-medium text-gray-700 whitespace-nowrap">
+          Por página:
+        </label>
+        <select
+          id="items-per-page"
+          value={itemsPerPage}
+          onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
+          className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          disabled={isLoading}
+        >
+          {itemsPerPageOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
       </div>
+
+      {/* Navegação de páginas */}
+      {totalPages > 1 && (
+        <div className="flex items-center space-x-2">
+          {/* Botão página anterior */}
+          <button
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage === 0 || isLoading}
+            className="flex items-center justify-center w-8 h-8 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border border-blue-200"
+            title="Página anterior"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          {/* Informação da página atual */}
+          <span className="text-sm font-medium text-gray-700 bg-gray-50 px-3 py-1 rounded-md border border-gray-200 whitespace-nowrap">
+            Página {currentPage + 1} de {totalPages}
+          </span>
+
+          {/* Botão próxima página */}
+          <button
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage >= totalPages - 1 || isLoading}
+            className="flex items-center justify-center w-8 h-8 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border border-blue-200"
+            title="Próxima página"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      )}
     </div>
   )
 }

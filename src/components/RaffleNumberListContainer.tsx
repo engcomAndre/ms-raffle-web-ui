@@ -25,23 +25,20 @@ export function RaffleNumberListContainer({
   const [currentPage, setCurrentPage] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
-  const [hasNext, setHasNext] = useState(false)
-  const [hasPrevious, setHasPrevious] = useState(false)
+  const [currentPageSize, setCurrentPageSize] = useState(pageSize)
 
-  const loadNumbers = async (page: number = 0) => {
+  const loadNumbers = async (page: number = 0, size: number = currentPageSize) => {
     try {
       setIsLoading(true)
       setError(null)
       
-      const response = await raffleService.getRaffleNumbers(raffleId, page, pageSize)
+      const response = await raffleService.getRaffleNumbers(raffleId, page, size)
       
       if (response.success && response.data) {
         const data = response.data
         setNumbers(data.rafflesNumbers || [])
         setTotalElements(data.totalElements || 0)
         setTotalPages(data.totalPages || 0)
-        setHasNext(data.hasNext || false)
-        setHasPrevious(data.hasPrevious || false)
         setCurrentPage(data.pageNumber || 0)
         
         // Callback para notificar mudanças nos números
@@ -63,17 +60,23 @@ export function RaffleNumberListContainer({
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
-    loadNumbers(page)
+    loadNumbers(page, currentPageSize)
+  }
+
+  const handleItemsPerPageChange = (size: number) => {
+    setCurrentPageSize(size)
+    setCurrentPage(0) // Reset para primeira página
+    loadNumbers(0, size)
   }
 
   const handleRefresh = () => {
-    loadNumbers(currentPage)
+    loadNumbers(currentPage, currentPageSize)
   }
 
   // Carregar números quando o componente monta ou raffleId muda
   useEffect(() => {
     if (raffleId) {
-      loadNumbers(0)
+      loadNumbers(0, currentPageSize)
     }
   }, [raffleId])
 
@@ -116,13 +119,15 @@ export function RaffleNumberListContainer({
       />
 
       {/* Paginação */}
-      {showPagination && totalPages > 1 && (
+      {showPagination && (
         <RaffleNumberListPagination
+          totalNumbers={totalElements}
+          itemsPerPage={currentPageSize}
           currentPage={currentPage}
           totalPages={totalPages}
-          hasNext={hasNext}
-          hasPrevious={hasPrevious}
+          onItemsPerPageChange={handleItemsPerPageChange}
           onPageChange={handlePageChange}
+          isLoading={isLoading}
         />
       )}
     </div>
