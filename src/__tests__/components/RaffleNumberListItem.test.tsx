@@ -23,7 +23,7 @@ describe('RaffleNumberListItem', () => {
     render(<RaffleNumberListItem number={mockNumber} />)
     
     expect(screen.getByText('001')).toBeInTheDocument()
-    expect(screen.getByText('Disponível')).toBeInTheDocument()
+    expect(screen.getByText('Disp')).toBeInTheDocument()
     expect(screen.getByText('João Silva')).toBeInTheDocument()
     expect(screen.getByText('11999999999')).toBeInTheDocument()
   })
@@ -32,21 +32,21 @@ describe('RaffleNumberListItem', () => {
     const reservedNumber = { ...mockNumber, status: 'RESERVED' as const }
     render(<RaffleNumberListItem number={reservedNumber} />)
     
-    expect(screen.getByText('Reservado')).toBeInTheDocument()
+    expect(screen.getByText('Res')).toBeInTheDocument()
   })
 
   it('deve exibir status "Vendido" para números vendidos', () => {
     const soldNumber = { ...mockNumber, status: 'SOLD' as const }
     render(<RaffleNumberListItem number={soldNumber} />)
     
-    expect(screen.getByText('Vendido')).toBeInTheDocument()
+    expect(screen.getByText('Vend')).toBeInTheDocument()
   })
 
   it('deve exibir badge de ganhador quando winner for true', () => {
     const winnerNumber = { ...mockNumber, winner: true }
     render(<RaffleNumberListItem number={winnerNumber} />)
     
-    expect(screen.getByText('🏆 Ganhador')).toBeInTheDocument()
+    expect(screen.getByText('🏆')).toBeInTheDocument()
   })
 
   it('deve exibir informações do comprador quando disponível', () => {
@@ -72,7 +72,7 @@ describe('RaffleNumberListItem', () => {
     render(<RaffleNumberListItem number={reservedNumber} />)
     
     expect(screen.getByText('João Silva')).toBeInTheDocument()
-    expect(screen.getByText('Reservado por: Maria Santos')).toBeInTheDocument()
+    expect(screen.getByText('Res: Maria Santos')).toBeInTheDocument()
   })
 
   it('não deve exibir informações do comprador quando não disponível', () => {

@@ -47,9 +47,9 @@ describe('RaffleNumberList', () => {
   it('deve exibir estado de loading', () => {
     render(<RaffleNumberList numbers={[]} isLoading={true} />)
     
-    expect(screen.getByText('Carregando números...')).toBeInTheDocument()
+    expect(screen.getByText('Carregando...')).toBeInTheDocument()
     // O spinner não tem role status, apenas verifica se está presente
-    expect(screen.getByText('Carregando números...')).toBeInTheDocument()
+    expect(screen.getByText('Carregando...')).toBeInTheDocument()
   })
 
   it('deve exibir mensagem de erro', () => {
@@ -78,6 +78,6 @@ describe('RaffleNumberList', () => {
     // Verifica se o container com classes de grid está presente
     const gridContainer = screen.getByText('001').closest('.grid')
     expect(gridContainer).toBeInTheDocument()
-    expect(gridContainer).toHaveClass('grid', 'grid-cols-2', 'md:grid-cols-4', 'lg:grid-cols-6')
+    expect(gridContainer).toHaveClass('grid', 'grid-cols-3', 'md:grid-cols-6', 'lg:grid-cols-8', 'xl:grid-cols-10')
   })
 })

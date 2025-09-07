@@ -81,14 +81,14 @@ export function RaffleNumberListContainer({
   }, [raffleId])
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Header com informações e botão de refresh */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <h4 className="text-lg font-medium text-gray-900">Números da Rifa</h4>
+        <div className="flex items-center space-x-3">
+          <h4 className="text-base font-medium text-gray-900">Números da Rifa</h4>
           {totalElements > 0 && (
-            <span className="text-sm text-gray-500">
-              {totalElements} número{totalElements !== 1 ? 's' : ''} total{totalElements !== 1 ? 'is' : ''}
+            <span className="text-xs text-gray-500">
+              {totalElements} número{totalElements !== 1 ? 's' : ''}
             </span>
           )}
         </div>
@@ -96,10 +96,10 @@ export function RaffleNumberListContainer({
         <button
           onClick={handleRefresh}
           disabled={isLoading}
-          className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center px-2 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <svg 
-            className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} 
+            className={`w-3 h-3 mr-1 ${isLoading ? 'animate-spin' : ''}`} 
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24"

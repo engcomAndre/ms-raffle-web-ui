@@ -165,7 +165,7 @@ export function RaffleListItem({
       
       {/* Números da rifa (expandido) */}
       {isExpanded && (
-        <div className="border-t border-gray-200 bg-gray-50 p-6">
+        <div className="border-t border-gray-200 bg-gray-50 p-4">
           <RaffleNumberListContainer
             raffleId={raffle.id}
             pageSize={20}
