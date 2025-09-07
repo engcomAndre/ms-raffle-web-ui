@@ -1,9 +1,11 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { DashboardLayout } from '@/components/DashboardLayout'
 import { useGoogleButtonSafe } from '@/hooks/useGoogleButtonSafe'
 
 export default function DashboardPage() {
+  const router = useRouter()
   const { user } = useGoogleButtonSafe()
 
   return (
@@ -88,7 +90,10 @@ export default function DashboardPage() {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-gray-900">Minhas Rifas</h2>
-          <button className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+          <button 
+            onClick={() => router.push('/create-raffle')}
+            className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+          >
             + Criar Nova Rifa
           </button>
         </div>
@@ -102,7 +107,10 @@ export default function DashboardPage() {
             Você ainda não criou nenhuma rifa. Comece criando sua primeira rifa e começe a receber participações!
           </p>
           
-          <button className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-lg transition-colors">
+          <button 
+            onClick={() => router.push('/create-raffle')}
+            className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+          >
             🎯 Criar Minha Primeira Rifa
           </button>
         </div>
