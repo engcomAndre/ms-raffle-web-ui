@@ -1,12 +1,13 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { DashboardLayout } from '@/components/DashboardLayout'
+import { CreateRaffleModal } from '@/components/CreateRaffleModal'
 import { useGoogleButtonSafe } from '@/hooks/useGoogleButtonSafe'
 
 export default function DashboardPage() {
-  const router = useRouter()
   const { user } = useGoogleButtonSafe()
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
   return (
     <DashboardLayout currentPage="Minhas Rifas">
@@ -91,7 +92,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-gray-900">Minhas Rifas</h2>
           <button 
-            onClick={() => router.push('/create-raffle')}
+            onClick={() => setIsCreateModalOpen(true)}
             className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
           >
             + Criar Nova Rifa
@@ -108,13 +109,23 @@ export default function DashboardPage() {
           </p>
           
           <button 
-            onClick={() => router.push('/create-raffle')}
+            onClick={() => setIsCreateModalOpen(true)}
             className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-lg transition-colors"
           >
             🎯 Criar Minha Primeira Rifa
           </button>
         </div>
       </div>
+
+      {/* Modal de criação de rifa */}
+      <CreateRaffleModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={() => {
+          console.log('🎉 [DASHBOARD] Rifa criada com sucesso!')
+          // Aqui você pode adicionar lógica para recarregar dados se necessário
+        }}
+      />
     </DashboardLayout>
   )
 }
