@@ -35,11 +35,11 @@ export function CreateRaffleModal({ isOpen, onClose, onSuccess }: CreateRaffleMo
     const today = new Date()
     const tomorrow = new Date(today)
     tomorrow.setDate(today.getDate() + 1)
-    tomorrow.setHours(9, 0, 0, 0) // 9:00 AM
+    tomorrow.setHours(0, 0, 0, 0) // 00:00
 
     const nextWeek = new Date(today)
     nextWeek.setDate(today.getDate() + 7)
-    nextWeek.setHours(23, 59, 0, 0) // 11:59 PM
+    nextWeek.setHours(23, 59, 0, 0) // 23:59
 
     setFormData(prev => ({
       ...prev,
@@ -203,7 +203,7 @@ export function CreateRaffleModal({ isOpen, onClose, onSuccess }: CreateRaffleMo
                   Aplicar Sugestão
                 </button>
                 <div className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
-                  Amanhã 9:00 → +7 dias 23:59
+                  Amanhã 00:00 → +7 dias 23:59
                 </div>
               </div>
             </div>
