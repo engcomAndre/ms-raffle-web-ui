@@ -13,7 +13,12 @@ export function DashboardLayout({ children, currentPage = 'Minhas Rifas' }: Dash
   const [dropdownOpen, setDropdownOpen] = useState(false)
   
   // Obter dados do usuário do localStorage
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<{
+    username: string
+    email: string
+    picture: string
+    provider: string
+  } | null>(null)
 
   // Carregar dados do usuário no useEffect
   useEffect(() => {

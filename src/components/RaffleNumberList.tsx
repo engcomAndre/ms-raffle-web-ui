@@ -1,21 +1,48 @@
 'use client'
 
-import { RaffleNumberItemResponse } from '@/types/raffle'
+import { useState } from 'react'
+import { RaffleNumberItemResponse, RaffleResponse } from '@/types/raffle'
 import { RaffleNumberListItem } from './RaffleNumberListItem'
+import { Toast } from './Toast'
 
 interface RaffleNumberListProps {
   numbers: RaffleNumberItemResponse[]
+  raffleId: string
+  raffleInfo?: RaffleResponse | null
   isLoading?: boolean
   error?: string | null
   emptyMessage?: string
+  onReserveSuccess?: (number: number) => void
+  onReserveError?: (error: string) => void
 }
 
 export function RaffleNumberList({ 
   numbers, 
+  raffleId,
+  raffleInfo,
   isLoading = false, 
   error = null, 
-  emptyMessage = 'Nenhum número encontrado para esta rifa.' 
+  emptyMessage = 'Nenhum número encontrado para esta rifa.',
+  onReserveSuccess,
+  onReserveError
 }: RaffleNumberListProps) {
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' | 'info' } | null>(null)
+
+  const handleReserveSuccess = (number: number) => {
+    setToast({
+      message: `Número ${number} atualizado com sucesso!`,
+      type: 'success'
+    })
+    onReserveSuccess?.(number)
+  }
+
+  const handleReserveError = (error: string) => {
+    setToast({
+      message: error,
+      type: 'error'
+    })
+    onReserveError?.(error)
+  }
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-6">
@@ -52,10 +79,29 @@ export function RaffleNumberList({
   }
 
   return (
-    <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2">
-      {numbers.map((number) => (
-        <RaffleNumberListItem key={number.number} number={number} />
-      ))}
+    <div className="space-y-4">
+      {/* Grid de números */}
+      <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2">
+        {numbers.map((number) => (
+          <RaffleNumberListItem 
+            key={number.number} 
+            number={number} 
+            raffleId={raffleId}
+            raffleInfo={raffleInfo}
+            onReserveSuccess={handleReserveSuccess}
+            onReserveError={handleReserveError}
+          />
+        ))}
+      </div>
+
+        {/* Toast de feedback */}
+        {toast && (
+          <Toast
+            message={toast.message}
+            type={toast.type}
+            onClose={() => setToast(null)}
+          />
+        )}
     </div>
   )
 }

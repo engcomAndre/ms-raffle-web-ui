@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { RaffleNumberItemResponse, RaffleNumbersResponse } from '@/types/raffle'
+import { RaffleNumberItemResponse, RaffleResponse } from '@/types/raffle'
 import { raffleService } from '@/services/raffleService'
 import { RaffleNumberList } from './RaffleNumberList'
 import { RaffleNumberListPagination } from './RaffleNumberListPagination'
@@ -27,6 +27,18 @@ export function RaffleNumberListContainer({
   const [totalElements, setTotalElements] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
   const [currentPageSize, setCurrentPageSize] = useState(pageSize)
+  const [raffleInfo, setRaffleInfo] = useState<RaffleResponse | null>(null)
+
+  const loadRaffleInfo = async () => {
+    try {
+      const response = await raffleService.getRaffleById(raffleId)
+      if (response.success && response.data) {
+        setRaffleInfo(response.data)
+      }
+    } catch (error) {
+      console.error('Erro ao carregar informações da rifa:', error)
+    }
+  }
 
   const loadNumbers = async (page: number = 0, size: number = currentPageSize) => {
     try {
@@ -74,6 +86,23 @@ export function RaffleNumberListContainer({
     loadNumbers(currentPage, currentPageSize)
   }
 
+  const handleReserveSuccess = () => {
+    // Recarregar os dados após reserva/desreserva bem-sucedida
+    loadNumbers(currentPage, currentPageSize)
+  }
+
+  const handleReserveError = (error: string) => {
+    // O feedback visual já é tratado no RaffleNumberList
+    // Não logar mensagens de usuário como erros
+  }
+
+  // Carregar informações da rifa quando o componente monta ou raffleId muda
+  useEffect(() => {
+    if (raffleId) {
+      loadRaffleInfo()
+    }
+  }, [raffleId])
+
   // Carregar números quando o componente monta ou raffleId muda
   useEffect(() => {
     if (raffleId) {
@@ -117,9 +146,13 @@ export function RaffleNumberListContainer({
       {/* Lista de números */}
       <RaffleNumberList
         numbers={numbers}
+        raffleId={raffleId}
+        raffleInfo={raffleInfo}
         isLoading={isLoading}
         error={error}
         emptyMessage="Nenhum número encontrado para esta rifa."
+        onReserveSuccess={handleReserveSuccess}
+        onReserveError={handleReserveError}
       />
 
       {/* Paginação */}
