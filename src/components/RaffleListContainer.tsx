@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { RaffleList } from './RaffleList'
 import { RaffleListControls } from './RaffleListControls'
 import { raffleService } from '@/services/raffleService'
@@ -10,6 +11,7 @@ interface RaffleListContainerProps {
 }
 
 export function RaffleListContainer({ className = '' }: RaffleListContainerProps) {
+  const router = useRouter()
   const [totalRaffles, setTotalRaffles] = useState(0)
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [currentPage, setCurrentPage] = useState(0)
@@ -60,6 +62,20 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
 
   return (
     <div className={`bg-gray-50 rounded-lg shadow-lg border border-gray-200 p-6 space-y-4 ${className}`}>
+      {/* Cabeçalho com título e botão de criar rifa */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">Minhas Rifas</h2>
+          <p className="text-sm text-gray-600">Gerencie suas rifas e acompanhe o desempenho</p>
+        </div>
+        <button 
+          onClick={() => router.push('/create-raffle')}
+          className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+        >
+          + Criar Nova Rifa
+        </button>
+      </div>
+
       {/* Cabeçalho com controles */}
       <RaffleListControls
         totalRaffles={totalRaffles}
