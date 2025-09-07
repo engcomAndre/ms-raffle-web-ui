@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { RaffleList } from './RaffleList'
+import { useState, useEffect, useRef } from 'react'
+import { RaffleList, RaffleListRef } from './RaffleList'
 import { RaffleListControls } from './RaffleListControls'
 import { CreateRaffleModal } from './CreateRaffleModal'
 import { raffleService } from '@/services/raffleService'
@@ -19,6 +19,9 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
   const [isLoading, setIsLoading] = useState(true)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  
+  // Ref para acessar métodos do RaffleList
+  const raffleListRef = useRef<RaffleListRef>(null)
 
   // Remover carregamento duplicado - agora o RaffleList gerencia os dados
 
@@ -63,7 +66,7 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
   const handleCreateSuccess = () => {
     // Recarregar a lista de rifas após criação bem-sucedida
     console.log('🎉 [RAFFLE-CONTAINER] Rifa criada com sucesso, recarregando lista...')
-    // O RaffleList vai recarregar automaticamente quando detectar mudanças
+    raffleListRef.current?.refresh()
   }
 
   return (
@@ -101,6 +104,7 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
       {/* Lista de rifas */}
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
         <RaffleList 
+          ref={raffleListRef}
           currentPage={currentPage}
           pageSize={itemsPerPage}
           searchTerm={searchTerm}

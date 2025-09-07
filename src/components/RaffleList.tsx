@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useImperativeHandle, forwardRef } from 'react'
 import { raffleService } from '@/services/raffleService'
 import { RaffleResponse, RafflePageResponse } from '@/types/raffle'
 import { RaffleListItem } from './RaffleListItem'
@@ -15,16 +15,20 @@ interface RaffleListProps {
   onDataChange?: (totalRaffles: number, totalPages: number) => void
 }
 
+export interface RaffleListRef {
+  refresh: () => void
+}
 
 
-export function RaffleList({ 
+
+export const RaffleList = forwardRef<RaffleListRef, RaffleListProps>(({ 
   currentPage = 0, 
   pageSize = 10, 
   searchTerm = '', 
   statusFilter = 'all', 
   onRefresh,
   onDataChange
-}: RaffleListProps) {
+}, ref) => {
   const [allRaffles, setAllRaffles] = useState<RaffleResponse[]>([])
   const [filteredRaffles, setFilteredRaffles] = useState<RaffleResponse[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -103,6 +107,11 @@ export function RaffleList({
       setIsLoading(false)
     }
   }
+
+  // Expor função de refresh via ref
+  useImperativeHandle(ref, () => ({
+    refresh: loadRaffles
+  }))
 
   // Carregar rifas apenas quando não há filtros ou na primeira carga
   useEffect(() => {
@@ -288,4 +297,4 @@ export function RaffleList({
       />
     </div>
   )
-}
+})
