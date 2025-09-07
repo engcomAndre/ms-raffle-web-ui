@@ -31,6 +31,23 @@ export function CreateRaffleModal({ isOpen, onClose, onSuccess }: CreateRaffleMo
     }))
   }
 
+  const handlePreconfigureDates = () => {
+    const today = new Date()
+    const tomorrow = new Date(today)
+    tomorrow.setDate(today.getDate() + 1)
+    tomorrow.setHours(9, 0, 0, 0) // 9:00 AM
+
+    const nextWeek = new Date(today)
+    nextWeek.setDate(today.getDate() + 7)
+    nextWeek.setHours(23, 59, 0, 0) // 11:59 PM
+
+    setFormData(prev => ({
+      ...prev,
+      startAt: tomorrow.toISOString().slice(0, 16), // Format for datetime-local input
+      endAt: nextWeek.toISOString().slice(0, 16)
+    }))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -91,7 +108,7 @@ export function CreateRaffleModal({ isOpen, onClose, onSuccess }: CreateRaffleMo
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
@@ -170,36 +187,57 @@ export function CreateRaffleModal({ isOpen, onClose, onSuccess }: CreateRaffleMo
             </p>
           </div>
 
-          {/* Data de início */}
-          <div>
-            <label htmlFor="startAt" className="block text-sm font-medium text-gray-700 mb-2">
-              Data de Início *
-            </label>
-            <input
-              type="datetime-local"
-              id="startAt"
-              name="startAt"
-              value={formData.startAt}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
-          </div>
+          {/* Seção de Datas */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-medium text-gray-900">Período da Rifa</h3>
+              <button
+                type="button"
+                onClick={handlePreconfigureDates}
+                className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Preconfigurar Datas
+              </button>
+            </div>
 
-          {/* Data de fim */}
-          <div>
-            <label htmlFor="endAt" className="block text-sm font-medium text-gray-700 mb-2">
-              Data de Fim *
-            </label>
-            <input
-              type="datetime-local"
-              id="endAt"
-              name="endAt"
-              value={formData.endAt}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Data de início */}
+              <div>
+                <label htmlFor="startAt" className="block text-sm font-medium text-gray-700 mb-2">
+                  Data de Início *
+                </label>
+                <input
+                  type="datetime-local"
+                  id="startAt"
+                  name="startAt"
+                  value={formData.startAt}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+                <p className="text-xs text-gray-500 mt-1">Amanhã às 9:00</p>
+              </div>
+
+              {/* Data de fim */}
+              <div>
+                <label htmlFor="endAt" className="block text-sm font-medium text-gray-700 mb-2">
+                  Data de Fim *
+                </label>
+                <input
+                  type="datetime-local"
+                  id="endAt"
+                  name="endAt"
+                  value={formData.endAt}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+                <p className="text-xs text-gray-500 mt-1">Em 7 dias às 23:59</p>
+              </div>
+            </div>
           </div>
 
           {/* Botões */}
