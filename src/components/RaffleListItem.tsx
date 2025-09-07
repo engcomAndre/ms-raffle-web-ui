@@ -87,17 +87,17 @@ export function RaffleListItem({
               </div>
               <div>
                 <span className="text-gray-500">Números criados:</span>
-                <p className="font-medium text-gray-900">
+                <div className="font-medium text-gray-900">
                   <span className="font-medium">{raffle.numbersCreated || 0}</span>
                   <div className="text-xs text-gray-500">de {raffle.maxNumbers || 'Não definido'}</div>
-                </p>
+                </div>
               </div>
               <div>
                 <span className="text-gray-500">Período:</span>
-                <p className="font-medium text-gray-900">
+                <div className="font-medium text-gray-900">
                   <div>{formatDate(raffle.startAt)}</div>
                   <div className="text-xs text-gray-400">até {formatDate(raffle.endAt)}</div>
-                </p>
+                </div>
               </div>
               <div>
                 <span className="text-gray-500">Criada em:</span>
