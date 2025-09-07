@@ -7,55 +7,36 @@ interface RaffleNumberListItemProps {
 }
 
 export function RaffleNumberListItem({ number }: RaffleNumberListItemProps) {
-  const getNumberStatusBadge = (status: RaffleNumberStatus) => {
+  const getStatusClasses = (status: RaffleNumberStatus) => {
     switch (status) {
       case 'ACTIVE':
-        return (
-          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-            Disp
-          </span>
-        )
+        return 'bg-green-50 border-green-200 text-green-900'
       case 'RESERVED':
-        return (
-          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
-            Res
-          </span>
-        )
+        return 'bg-yellow-50 border-yellow-200 text-yellow-900'
       case 'SOLD':
-        return (
-          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-            Vend
-          </span>
-        )
+        return 'bg-gray-100 border-gray-300 text-gray-600'
       default:
-        return (
-          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-            {status}
-          </span>
-        )
+        return 'bg-gray-50 border-gray-200 text-gray-900'
     }
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded p-2 text-center hover:shadow-sm transition-shadow">
-      <div className="text-sm font-semibold text-gray-900 mb-1">
+    <div className={`border rounded p-2 text-center hover:shadow-sm transition-shadow ${getStatusClasses(number.status)}`}>
+      <div className="text-sm font-semibold mb-1">
         {number.number}
       </div>
-      <div className="mb-1">
-        {getNumberStatusBadge(number.status)}
-      </div>
       {(number.buyerName || number.owner) && (
-        <div className="text-xs text-gray-600">
+        <div className="text-xs">
           <div className="font-medium truncate">{number.buyerName || number.owner}</div>
-          {number.buyerPhone && <div className="text-gray-500 truncate">{number.buyerPhone}</div>}
+          {number.buyerPhone && <div className="opacity-75 truncate">{number.buyerPhone}</div>}
           {number.reservedBy && number.reservedBy !== (number.buyerName || number.owner) && (
-            <div className="text-gray-500 truncate">Res: {number.reservedBy}</div>
+            <div className="opacity-75 truncate">Res: {number.reservedBy}</div>
           )}
         </div>
       )}
       {number.winner && (
         <div className="mt-1">
-          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-yellow-200 text-yellow-800">
             🏆
           </span>
         </div>

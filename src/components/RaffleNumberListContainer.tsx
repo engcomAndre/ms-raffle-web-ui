@@ -5,6 +5,7 @@ import { RaffleNumberItemResponse, RaffleNumbersResponse } from '@/types/raffle'
 import { raffleService } from '@/services/raffleService'
 import { RaffleNumberList } from './RaffleNumberList'
 import { RaffleNumberListPagination } from './RaffleNumberListPagination'
+import { RaffleNumberLegend } from './RaffleNumberLegend'
 
 interface RaffleNumberListContainerProps {
   raffleId: string
@@ -109,6 +110,9 @@ export function RaffleNumberListContainer({
           Atualizar
         </button>
       </div>
+
+      {/* Legenda */}
+      <RaffleNumberLegend />
 
       {/* Lista de números */}
       <RaffleNumberList

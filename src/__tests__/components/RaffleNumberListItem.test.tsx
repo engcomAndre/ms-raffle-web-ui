@@ -23,23 +23,31 @@ describe('RaffleNumberListItem', () => {
     render(<RaffleNumberListItem number={mockNumber} />)
     
     expect(screen.getByText('001')).toBeInTheDocument()
-    expect(screen.getByText('Disp')).toBeInTheDocument()
     expect(screen.getByText('João Silva')).toBeInTheDocument()
     expect(screen.getByText('11999999999')).toBeInTheDocument()
   })
 
-  it('deve exibir status "Reservado" para números reservados', () => {
-    const reservedNumber = { ...mockNumber, status: 'RESERVED' as const }
-    render(<RaffleNumberListItem number={reservedNumber} />)
+  it('deve aplicar classes corretas para números disponíveis', () => {
+    const { container } = render(<RaffleNumberListItem number={mockNumber} />)
     
-    expect(screen.getByText('Res')).toBeInTheDocument()
+    const numberElement = container.firstChild as HTMLElement
+    expect(numberElement).toHaveClass('bg-green-50', 'border-green-200', 'text-green-900')
   })
 
-  it('deve exibir status "Vendido" para números vendidos', () => {
-    const soldNumber = { ...mockNumber, status: 'SOLD' as const }
-    render(<RaffleNumberListItem number={soldNumber} />)
+  it('deve aplicar classes corretas para números reservados', () => {
+    const reservedNumber = { ...mockNumber, status: 'RESERVED' as const }
+    const { container } = render(<RaffleNumberListItem number={reservedNumber} />)
     
-    expect(screen.getByText('Vend')).toBeInTheDocument()
+    const numberElement = container.firstChild as HTMLElement
+    expect(numberElement).toHaveClass('bg-yellow-50', 'border-yellow-200', 'text-yellow-900')
+  })
+
+  it('deve aplicar classes corretas para números vendidos', () => {
+    const soldNumber = { ...mockNumber, status: 'SOLD' as const }
+    const { container } = render(<RaffleNumberListItem number={soldNumber} />)
+    
+    const numberElement = container.firstChild as HTMLElement
+    expect(numberElement).toHaveClass('bg-gray-100', 'border-gray-300', 'text-gray-600')
   })
 
   it('deve exibir badge de ganhador quando winner for true', () => {
