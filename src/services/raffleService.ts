@@ -1,6 +1,6 @@
 import { ApiService, ApiResponse } from './api'
 import { environment } from '../config/environment'
-import { RaffleCreationData, CreateRaffleResponse, RaffleResponse, RafflePageResponse, RaffleNumbersResponse, RaffleNumbersPageResponse } from '../types/raffle'
+import { RaffleCreationData, RaffleResponse, RafflePageResponse, RaffleNumbersResponse } from '../types/raffle'
 
 export class RaffleService {
   private readonly raffleApiService: ApiService
@@ -130,6 +130,65 @@ export class RaffleService {
     const response = await this.raffleApiService.get<RaffleNumbersResponse>(`/v1/raffles/${raffleId}/numbers?page=${page}&size=${size}`)
     
     console.log('📊 [RAFFLE] Números da rifa encontrados:', response)
+    return response
+  }
+
+  /**
+   * Reserva um número de rifa
+   */
+  async reserveRaffleNumber(raffleId: string, number: number): Promise<ApiResponse<void>> {
+    console.log(`🔒 [RAFFLE] Reservando número ${number} da rifa ID: ${raffleId}`)
+    
+    const response = await this.raffleApiService.post<void>(`/v1/raffles/${raffleId}/numbers/reserve`, { number })
+    
+    console.log('📊 [RAFFLE] Resposta da reserva:', response)
+    
+    if (!response.success) {
+      // Se não foi bem-sucedido, lançar erro para ser capturado pelo catch
+      const error = new Error(response.message || 'Erro ao reservar número')
+      ;(error as any).response = { data: response }
+      throw error
+    }
+    
+    return response
+  }
+
+  /**
+   * Marca um número de rifa como vendido
+   */
+  async sellRaffleNumber(raffleId: string, number: number): Promise<ApiResponse<void>> {
+    console.log(`💰 [RAFFLE] Vendendo número ${number} da rifa ID: ${raffleId}`)
+    
+    const response = await this.raffleApiService.post<void>(`/v1/raffles/${raffleId}/numbers/sold`, { number })
+    
+    console.log('📊 [RAFFLE] Resposta da venda:', response)
+    
+    if (!response.success) {
+      // Se não foi bem-sucedido, lançar erro para ser capturado pelo catch
+      const error = new Error(response.message || 'Erro ao vender número')
+      ;(error as any).response = { data: response }
+      throw error
+    }
+    
+    return response
+  }
+
+  /**
+   * Desreserva um número de rifa
+   */
+  async unreserveRaffleNumber(raffleId: string, number: number): Promise<ApiResponse<void>> {
+    console.log(`♻️ [RAFFLE] Desreservando número ${number} da rifa ID: ${raffleId}`)
+
+    const response = await this.raffleApiService.post<void>(`/v1/raffles/${raffleId}/numbers/unreserve`, { number })
+
+    console.log('📊 [RAFFLE] Resposta da desreserva:', response)
+
+    if (!response.success) {
+      const error = new Error(response.message || 'Erro ao desreservar número')
+      ;(error as any).response = { data: response }
+      throw error
+    }
+
     return response
   }
 }

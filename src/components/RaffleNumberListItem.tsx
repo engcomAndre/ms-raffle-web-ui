@@ -1,29 +1,119 @@
 'use client'
 
-import { RaffleNumberItemResponse, RaffleNumberStatus } from '@/types/raffle'
+import { useState, useEffect } from 'react'
+import { RaffleNumberItemResponse, RaffleNumberStatus, RaffleResponse } from '@/types/raffle'
+import { raffleService } from '@/services/raffleService'
+import { getErrorMessage } from '@/utils/errorMessages'
 
 interface RaffleNumberListItemProps {
   number: RaffleNumberItemResponse
+  raffleId: string
+  raffleInfo?: RaffleResponse | null
+  onReserveSuccess?: (number: number) => void
+  onReserveError?: (error: string) => void
 }
 
-export function RaffleNumberListItem({ number }: RaffleNumberListItemProps) {
+export function RaffleNumberListItem({
+  number,
+  raffleId,
+  raffleInfo,
+  onReserveSuccess,
+  onReserveError
+}: RaffleNumberListItemProps) {
+  const [isReserving, setIsReserving] = useState(false)
+  const [localStatus, setLocalStatus] = useState(number.status)
+
+  // Sincronizar status local com o status do número quando ele mudar
+  useEffect(() => {
+    setLocalStatus(number.status)
+  }, [number.status])
+
   const getStatusClasses = (status: RaffleNumberStatus) => {
+    // Se a rifa não está ativa, todos os números ficam desabilitados
+    if (!isRaffleActive) {
+      return 'bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed opacity-60'
+    }
+    
     switch (status) {
       case 'ACTIVE':
-        return 'bg-green-50 border-green-200 text-green-900'
+        return 'bg-green-100 border-green-300 text-green-800 cursor-pointer hover:bg-green-200'
       case 'RESERVED':
-        return 'bg-yellow-50 border-yellow-200 text-yellow-900'
+        return 'bg-yellow-100 border-yellow-300 text-yellow-800 cursor-not-allowed'
       case 'SOLD':
-        return 'bg-gray-100 border-gray-300 text-gray-600'
+        return 'bg-gray-200 border-gray-400 text-gray-700 cursor-not-allowed'
       default:
-        return 'bg-gray-50 border-gray-200 text-gray-900'
+        return 'bg-gray-100 border-gray-300 text-gray-800 cursor-pointer hover:bg-gray-200'
     }
   }
 
+  // Verificar se a rifa está ativa
+  const isRaffleActive = raffleInfo ? raffleInfo.active : true
+  
+  const canReserve = localStatus === 'ACTIVE' && !isReserving && isRaffleActive
+  const canUnreserve = localStatus === 'RESERVED' && !isReserving && isRaffleActive
+
+  const handleClick = async () => {
+    // Pré-checagem de rifa inativa
+    if (!isRaffleActive) {
+      onReserveError?.('Não é possível reservar números de uma rifa inativa')
+      return
+    }
+
+    // Toggle: reservar se ACTIVE, desreservar se RESERVED
+    if (canReserve) {
+      setIsReserving(true)
+      setLocalStatus('RESERVED')
+      try {
+        await raffleService.reserveRaffleNumber(raffleId, number.number)
+        onReserveSuccess?.(number.number)
+      } catch (error: unknown) {
+        setLocalStatus('ACTIVE')
+        const errorMessage = getErrorMessage(error)
+        onReserveError?.(errorMessage)
+      } finally {
+        setIsReserving(false)
+      }
+      return
+    }
+
+    if (canUnreserve) {
+      setIsReserving(true)
+      setLocalStatus('ACTIVE')
+      try {
+        await raffleService.unreserveRaffleNumber(raffleId, number.number)
+        // Reutilizamos o callback de sucesso para refresh, a mensagem virá do List
+        onReserveSuccess?.(number.number)
+      } catch (error: unknown) {
+        setLocalStatus('RESERVED')
+        const errorMessage = getErrorMessage(error)
+        onReserveError?.(errorMessage)
+      } finally {
+        setIsReserving(false)
+      }
+      return
+    }
+  }
+
+  const statusClasses = getStatusClasses(localStatus)
+
   return (
-    <div className={`border rounded p-2 text-center hover:shadow-sm transition-shadow ${getStatusClasses(number.status)}`}>
+    <div
+      className={`border rounded p-2 text-center transition-all duration-200 ${statusClasses} ${
+        canReserve ? 'hover:shadow-md' : ''
+      }`}
+      onClick={handleClick}
+    >
       <div className="text-sm font-semibold mb-1">
         {number.number}
+        {isReserving && (
+          <span className="ml-1 text-xs opacity-75">⏳</span>
+        )}
+        {localStatus === 'RESERVED' && (
+          <span className="ml-1 text-xs font-bold text-yellow-600">✓</span>
+        )}
+        {!isRaffleActive && (
+          <span className="ml-1 text-xs font-bold text-gray-500">🚫</span>
+        )}
       </div>
       {(number.buyerName || number.owner) && (
         <div className="text-xs">
