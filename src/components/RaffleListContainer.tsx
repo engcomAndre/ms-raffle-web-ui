@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { RaffleList } from './RaffleList'
+import { useState, useEffect, useRef } from 'react'
+import { RaffleList, RaffleListRef } from './RaffleList'
 import { RaffleListControls } from './RaffleListControls'
+import { CreateRaffleModal } from './CreateRaffleModal'
 import { raffleService } from '@/services/raffleService'
 
 interface RaffleListContainerProps {
@@ -17,6 +18,10 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
   const [isLoading, setIsLoading] = useState(true)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  
+  // Ref para acessar métodos do RaffleList
+  const raffleListRef = useRef<RaffleListRef>(null)
 
   // Remover carregamento duplicado - agora o RaffleList gerencia os dados
 
@@ -58,8 +63,28 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
     setIsLoading(false)
   }
 
+  const handleCreateSuccess = () => {
+    // Recarregar a lista de rifas após criação bem-sucedida
+    console.log('🎉 [RAFFLE-CONTAINER] Rifa criada com sucesso, recarregando lista...')
+    raffleListRef.current?.refresh()
+  }
+
   return (
     <div className={`bg-gray-50 rounded-lg shadow-lg border border-gray-200 p-6 space-y-4 ${className}`}>
+      {/* Cabeçalho com título e botão de criar rifa */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">Minhas Rifas</h2>
+          <p className="text-sm text-gray-600">Gerencie suas rifas e acompanhe o desempenho</p>
+        </div>
+        <button 
+          onClick={() => setIsCreateModalOpen(true)}
+          className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+        >
+          + Criar Nova Rifa
+        </button>
+      </div>
+
       {/* Cabeçalho com controles */}
       <RaffleListControls
         totalRaffles={totalRaffles}
@@ -79,6 +104,7 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
       {/* Lista de rifas */}
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
         <RaffleList 
+          ref={raffleListRef}
           currentPage={currentPage}
           pageSize={itemsPerPage}
           searchTerm={searchTerm}
@@ -87,6 +113,13 @@ export function RaffleListContainer({ className = '' }: RaffleListContainerProps
           onDataChange={handleDataChange}
         />
       </div>
+
+      {/* Modal de criação de rifa */}
+      <CreateRaffleModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={handleCreateSuccess}
+      />
     </div>
   )
 }

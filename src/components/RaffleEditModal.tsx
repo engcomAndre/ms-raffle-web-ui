@@ -106,7 +106,7 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Overlay */}
       <div 
-        className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+        className="fixed inset-0 bg-transparent backdrop-blur-sm transition-opacity"
         onClick={handleClose}
       />
       
