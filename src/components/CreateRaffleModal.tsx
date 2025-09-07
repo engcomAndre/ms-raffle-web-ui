@@ -108,7 +108,7 @@ export function CreateRaffleModal({ isOpen, onClose, onSuccess }: CreateRaffleMo
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-white bg-opacity-20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
@@ -191,16 +191,21 @@ export function CreateRaffleModal({ isOpen, onClose, onSuccess }: CreateRaffleMo
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-medium text-gray-900">Período da Rifa</h3>
-              <button
-                type="button"
-                onClick={handlePreconfigureDates}
-                className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                Preconfigurar Datas
-              </button>
+              <div className="flex items-center space-x-2">
+                <button
+                  type="button"
+                  onClick={handlePreconfigureDates}
+                  className="inline-flex items-center px-3 py-1.5 border border-blue-300 shadow-sm text-sm font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Aplicar Sugestão
+                </button>
+                <div className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
+                  Amanhã 9:00 → +7 dias 23:59
+                </div>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -218,7 +223,6 @@ export function CreateRaffleModal({ isOpen, onClose, onSuccess }: CreateRaffleMo
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
-                <p className="text-xs text-gray-500 mt-1">Amanhã às 9:00</p>
               </div>
 
               {/* Data de fim */}
@@ -235,7 +239,6 @@ export function CreateRaffleModal({ isOpen, onClose, onSuccess }: CreateRaffleMo
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
-                <p className="text-xs text-gray-500 mt-1">Em 7 dias às 23:59</p>
               </div>
             </div>
           </div>
