@@ -90,6 +90,7 @@ export enum RaffleNumberStatus {
 }
 
 export interface RaffleNumberItemResponse {
+  id: string
   raffleId: string
   number: string
   status: RaffleNumberStatus
@@ -99,6 +100,8 @@ export interface RaffleNumberItemResponse {
   soldAt: string | null
   soldBy: string | null
   owner: string | null
+  buyerName?: string
+  buyerPhone?: string
 }
 
 export interface RaffleNumbersResponse {
