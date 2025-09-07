@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { raffleService } from '@/services/raffleService'
 import { RaffleCreationData } from '@/types/raffle'
 
@@ -104,6 +104,23 @@ export function CreateRaffleModal({ isOpen, onClose, onSuccess }: CreateRaffleMo
       onClose()
     }
   }
+
+  // Fechar modal com ESC
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen && !isLoading) {
+        handleClose()
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown)
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isOpen, isLoading])
 
   if (!isOpen) return null
 
