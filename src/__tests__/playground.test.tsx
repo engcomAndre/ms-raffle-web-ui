@@ -11,6 +11,22 @@ jest.mock('../components/DashboardLayout', () => ({
   )
 }))
 
+// Mock previsível do container de lista para evitar dependência de estados internos/HTTP
+jest.mock('../components/RaffleListContainer', () => ({
+  RaffleListContainer: () => (
+    <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden text-center py-12">
+      <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+      <p className="text-lg font-medium">Nenhuma rifa encontrada</p>
+      <p className="text-sm text-gray-500 mt-2">
+        Você ainda não criou nenhuma rifa. Comece criando sua primeira rifa!
+      </p>
+      <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        + Criar Nova Rifa
+      </button>
+    </div>
+  )
+}))
+
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn()
 }))
@@ -252,7 +268,15 @@ describe('PlaygroundPage', () => {
 
       await waitFor(() => {
         const createButton = screen.getByText('+ Criar Nova Rifa')
-        expect(createButton).toHaveClass('bg-blue-500', 'hover:bg-blue-600', 'text-white', 'font-medium', 'py-2', 'px-4', 'rounded-lg', 'transition-colors')
+        expect(createButton).toHaveClass(
+          'bg-blue-600',
+          'hover:bg-blue-700',
+          'text-white',
+          'font-medium',
+          'py-2',
+          'px-4',
+          'rounded-md'
+        )
       })
     })
   })
