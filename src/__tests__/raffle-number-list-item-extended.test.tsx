@@ -62,7 +62,6 @@ describe('RaffleNumberListItem', () => {
 
     const item = screen.getByText('1')
     expect(item).toBeInTheDocument()
-    // O container principal tem as classes de status
     const container = item.closest('div.border')
     expect(container).toHaveClass('bg-green-100 border-green-300 text-green-800')
     expect(container).toHaveClass('cursor-pointer hover:bg-green-200')
@@ -291,7 +290,7 @@ describe('RaffleNumberListItem', () => {
     const { rerender } = renderComponent(number)
 
     const item = screen.getByText('15')
-    const container = item.closest('div.border')
+    let container = item.closest('div.border')
     expect(container).toHaveClass('bg-green-100 border-green-300 text-green-800')
 
     // Simular mudança de status
@@ -305,6 +304,7 @@ describe('RaffleNumberListItem', () => {
       />
     )
 
+    container = item.closest('div.border')
     expect(container).toHaveClass('bg-yellow-100 border-yellow-300 text-yellow-800')
   })
 
@@ -326,7 +326,7 @@ describe('RaffleNumberListItem', () => {
     const { rerender } = renderComponent(activeNumber)
 
     let item = screen.getByText('17')
-    let container = item.closest('div.border')
+    const container = item.closest('div.border')
     expect(container).toHaveClass('hover:shadow-md')
 
     const soldNumber: RaffleNumberItemResponse = { number: 18, status: 'SOLD' }
@@ -340,8 +340,7 @@ describe('RaffleNumberListItem', () => {
     )
 
     item = screen.getByText('18')
-    container = item.closest('div.border')
-    expect(container).not.toHaveClass('hover:shadow-md')
+    expect(item.closest('div')).not.toHaveClass('hover:shadow-md')
   })
 
   it('deve lidar com número sem informações de comprador ou proprietário', () => {

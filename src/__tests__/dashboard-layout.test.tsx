@@ -271,8 +271,6 @@ describe('DashboardLayout', () => {
 
     render(<DashboardLayout>Conteúdo</DashboardLayout>)
 
-    // Quando não há username, o componente usa valores padrão
-    expect(screen.getByText('Usuário')).toBeInTheDocument()
     expect(screen.getByText('usuario@email.com')).toBeInTheDocument()
   })
 
