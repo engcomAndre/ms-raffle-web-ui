@@ -7,7 +7,9 @@ import { apiService } from '../services/api'
 // Mock do apiService
 jest.mock('../services/api', () => ({
   apiService: {
-    post: jest.fn()
+    post: jest.fn(),
+    register: jest.fn(),
+    login: jest.fn()
   }
 }))
 
@@ -34,7 +36,7 @@ describe('Testes de Casos Extremos e Edge Cases', () => {
         roles: []
       }
 
-      mockApiService.post.mockResolvedValue({
+      mockApiService.register.mockResolvedValue({
         success: false,
         error: 'Dados inválidos',
         data: null
@@ -57,7 +59,7 @@ describe('Testes de Casos Extremos e Edge Cases', () => {
         roles: ['USER']
       }
 
-      mockApiService.post.mockResolvedValue({
+      mockApiService.register.mockResolvedValue({
         success: false,
         error: 'Email muito longo',
         data: null
@@ -80,7 +82,7 @@ describe('Testes de Casos Extremos e Edge Cases', () => {
         roles: ['USER']
       }
 
-      mockApiService.post.mockResolvedValue({
+      mockApiService.register.mockResolvedValue({
         success: true,
         data: { id: '123', username: 'testuser' },
         message: 'Usuário registrado'
@@ -101,7 +103,7 @@ describe('Testes de Casos Extremos e Edge Cases', () => {
         roles: ['USER']
       }
 
-      mockApiService.post.mockRejectedValue(new Error('Request timeout'))
+      mockApiService.register.mockRejectedValue(new Error('Request timeout'))
 
       await expect(authService.register(userData)).rejects.toThrow('Request timeout')
     })
@@ -116,7 +118,7 @@ describe('Testes de Casos Extremos e Edge Cases', () => {
         roles: ['USER']
       }
 
-      mockApiService.post.mockResolvedValue({
+      mockApiService.register.mockResolvedValue({
         success: true,
         data: null, // Dados nulos mas sucesso true
         message: undefined
@@ -216,7 +218,7 @@ describe('Testes de Casos Extremos e Edge Cases', () => {
           roles: ['USER']
         }
         
-        mockApiService.post.mockResolvedValue({
+        mockApiService.register.mockResolvedValue({
           success: true,
           data: { id: `id${index}`, username: `user${index}` },
           message: 'Usuário registrado'

@@ -62,3 +62,5 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}) {
     executeWithErrorHandling
   }
 }
+
+
