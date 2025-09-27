@@ -47,9 +47,4 @@ jobs:
           coverage/
           coverage.lcov
           
-    - name: Comment PR with coverage
-      if: github.event_name == 'pull_request'
-      uses: romeovs/lcov-reporter-action@v0.2.1
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        lcov-file: ./coverage/lcov.info
+    # Coverage comments are handled automatically by Codecov
