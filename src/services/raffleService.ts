@@ -191,6 +191,25 @@ export class RaffleService {
 
     return response
   }
+
+  /**
+   * Incrementa o número de números de uma rifa
+   */
+  async incrementRaffleNumbers(raffleId: string, incrementsBy: number): Promise<ApiResponse<void>> {
+    console.log(`➕ [RAFFLE] Incrementando ${incrementsBy} números na rifa ID: ${raffleId}`)
+
+    const response = await this.raffleApiService.post<void>(`/v1/raffles/${raffleId}/numbers/increment?incrementsBy=${incrementsBy}`)
+
+    console.log('📊 [RAFFLE] Resposta do incremento:', response)
+
+    if (!response.success) {
+      const error = new Error(response.message || 'Erro ao incrementar números')
+      ;(error as any).response = { data: response }
+      throw error
+    }
+
+    return response
+  }
 }
 
 // Instância padrão do RaffleService
