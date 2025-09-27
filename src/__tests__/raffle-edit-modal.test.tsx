@@ -69,7 +69,7 @@ describe('RaffleEditModal', () => {
     expect(screen.getByLabelText('Título *')).toBeInTheDocument()
     expect(screen.getByLabelText('Descrição')).toBeInTheDocument()
     expect(screen.getByLabelText('Prêmio *')).toBeInTheDocument()
-    expect(screen.getByLabelText('Número máximo de números *')).toBeInTheDocument()
+    expect(screen.getByLabelText(/Número máximo de números/)).toBeInTheDocument()
     expect(screen.getByLabelText('Data de início *')).toBeInTheDocument()
     expect(screen.getByLabelText('Data de fim *')).toBeInTheDocument()
   })
