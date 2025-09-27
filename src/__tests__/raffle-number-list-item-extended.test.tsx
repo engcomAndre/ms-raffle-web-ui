@@ -69,7 +69,7 @@ describe('RaffleNumberListItem', () => {
   })
 
   it('deve renderizar um número reservado corretamente', () => {
-    const number: RaffleNumberItemResponse = { number: 2, status: 'RESERVED', reservedBy: 'User A' }
+    const number: RaffleNumberItemResponse = { number: 2, status: 'RESERVED', reservedBy: 'User A', owner: 'Different User' }
     renderComponent(number)
 
     const item = screen.getByText('2')
