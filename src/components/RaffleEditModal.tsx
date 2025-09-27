@@ -13,7 +13,9 @@ interface RaffleEditModalProps {
 
 export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEditModalProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const [isIncrementing, setIsIncrementing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -22,19 +24,23 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
     startAt: '',
     endAt: ''
   })
+  const [originalMaxNumbers, setOriginalMaxNumbers] = useState(0)
 
   // Carregar dados da rifa quando o modal abrir
   useEffect(() => {
     if (isOpen && raffle) {
+      const maxNumbers = raffle.maxNumbers || 0
       setFormData({
         title: raffle.title || '',
         description: raffle.description || '',
         prize: raffle.prize || '',
-        maxNumbers: raffle.maxNumbers || 0,
+        maxNumbers: maxNumbers,
         startAt: raffle.startAt ? raffle.startAt.split('T')[0] + 'T' + raffle.startAt.split('T')[1].substring(0, 5) : '',
         endAt: raffle.endAt ? raffle.endAt.split('T')[0] + 'T' + raffle.endAt.split('T')[1].substring(0, 5) : ''
       })
+      setOriginalMaxNumbers(maxNumbers)
       setError(null)
+      setSuccessMessage(null)
     }
   }, [isOpen, raffle])
 
@@ -64,19 +70,77 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
     }))
   }
 
+  const handleIncrementNumbers = async () => {
+    if (!raffle) return
+
+    const newMaxNumbers = formData.maxNumbers
+    const originalNumbers = originalMaxNumbers
+
+    // Validar se o novo valor é maior que o original
+    if (newMaxNumbers <= originalNumbers) {
+      setError('O número máximo de números deve ser maior que o valor atual para incrementar.')
+      return
+    }
+
+    const incrementsBy = newMaxNumbers - originalNumbers
+
+    try {
+      setIsIncrementing(true)
+      setError(null)
+      setSuccessMessage(null)
+
+      console.log('➕ [RAFFLE-EDIT-MODAL] Incrementando números:', { 
+        raffleId: raffle.id, 
+        incrementsBy, 
+        originalNumbers, 
+        newMaxNumbers 
+      })
+
+      const response = await raffleService.incrementRaffleNumbers(raffle.id, incrementsBy)
+
+      if (response.success) {
+        console.log('✅ [RAFFLE-EDIT-MODAL] Números incrementados com sucesso')
+        setSuccessMessage(`Números incrementados com sucesso! ${incrementsBy} novos números foram adicionados.`)
+        setOriginalMaxNumbers(newMaxNumbers)
+      } else {
+        console.error('❌ [RAFFLE-EDIT-MODAL] Erro ao incrementar números:', response.error)
+        setError(response.message || 'Erro ao incrementar números')
+      }
+    } catch (error: any) {
+      console.error('💥 [RAFFLE-EDIT-MODAL] Erro inesperado ao incrementar números:', error)
+      setError(error.message || 'Erro inesperado ao incrementar números')
+    } finally {
+      setIsIncrementing(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!raffle) return
 
+    // Validar se não há decremento de números
+    if (formData.maxNumbers < originalMaxNumbers) {
+      setError('Não é possível diminuir o número de números. Apenas incrementos são permitidos.')
+      return
+    }
+
     try {
       setIsLoading(true)
       setError(null)
+      setSuccessMessage(null)
 
       console.log('✏️ [RAFFLE-EDIT-MODAL] Atualizando rifa:', raffle.id)
       console.log('📝 [RAFFLE-EDIT-MODAL] Dados do formulário:', formData)
 
-      const response = await raffleService.updateRaffle(raffle.id, formData)
+      // Se houve incremento, não atualizar o maxNumbers no update normal
+      const updateData = { ...formData }
+      if (formData.maxNumbers > originalMaxNumbers) {
+        // Manter o valor original para o update, pois o incremento já foi feito
+        updateData.maxNumbers = originalMaxNumbers
+      }
+
+      const response = await raffleService.updateRaffle(raffle.id, updateData)
 
       if (response.success) {
         console.log('✅ [RAFFLE-EDIT-MODAL] Rifa atualizada com sucesso')
@@ -95,7 +159,7 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
   }
 
   const handleClose = () => {
-    if (!isLoading) {
+    if (!isLoading && !isIncrementing) {
       onClose()
     }
   }
@@ -121,7 +185,7 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
             </h3>
             <button
               onClick={handleClose}
-              disabled={isLoading}
+              disabled={isLoading || isIncrementing}
               className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
               aria-label="Fechar modal"
             >
@@ -187,18 +251,58 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
             <div>
               <label htmlFor="maxNumbers" className="block text-sm font-medium text-gray-700 mb-2">
                 Número máximo de números *
+                {originalMaxNumbers > 0 && (
+                  <span className="text-xs text-gray-500 ml-2">
+                    (Atual: {originalMaxNumbers})
+                  </span>
+                )}
               </label>
-              <input
-                type="number"
-                id="maxNumbers"
-                value={formData.maxNumbers}
-                onChange={(e) => handleInputChange('maxNumbers', parseInt(e.target.value) || 0)}
-                required
-                min="1"
-                disabled={isLoading}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                placeholder="Ex: 100"
-              />
+              <div className="flex space-x-2">
+                <input
+                  type="number"
+                  id="maxNumbers"
+                  value={formData.maxNumbers}
+                  onChange={(e) => handleInputChange('maxNumbers', parseInt(e.target.value) || 0)}
+                  required
+                  min="1"
+                  disabled={isLoading || isIncrementing}
+                  className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed ${
+                    formData.maxNumbers < originalMaxNumbers 
+                      ? 'border-red-300 bg-red-50' 
+                      : formData.maxNumbers > originalMaxNumbers 
+                        ? 'border-green-300 bg-green-50' 
+                        : 'border-gray-300'
+                  }`}
+                  placeholder="Ex: 100"
+                />
+                {formData.maxNumbers > originalMaxNumbers && (
+                  <button
+                    type="button"
+                    onClick={handleIncrementNumbers}
+                    disabled={isLoading || isIncrementing}
+                    className="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isIncrementing ? (
+                      <div className="flex items-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Incrementando...
+                      </div>
+                    ) : (
+                      `+${formData.maxNumbers - originalMaxNumbers}`
+                    )}
+                  </button>
+                )}
+              </div>
+              {formData.maxNumbers < originalMaxNumbers && (
+                <p className="mt-1 text-sm text-red-600">
+                  ⚠️ Não é possível diminuir o número de números. Apenas incrementos são permitidos.
+                </p>
+              )}
+              {formData.maxNumbers > originalMaxNumbers && (
+                <p className="mt-1 text-sm text-green-600">
+                  ✅ {formData.maxNumbers - originalMaxNumbers} novos números serão adicionados.
+                </p>
+              )}
             </div>
 
             {/* Data de início */}
@@ -247,19 +351,33 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
               </div>
             )}
 
+            {/* Sucesso */}
+            {successMessage && (
+              <div className="bg-green-50 border border-green-200 rounded-md p-4">
+                <div className="flex">
+                  <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <div className="ml-3">
+                    <p className="text-sm text-green-800">{successMessage}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Botões */}
             <div className="flex items-center justify-end space-x-3 pt-6 border-t border-gray-200">
               <button
                 type="button"
                 onClick={handleClose}
-                disabled={isLoading}
+                disabled={isLoading || isIncrementing}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || isIncrementing}
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
