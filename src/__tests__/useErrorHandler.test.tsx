@@ -25,10 +25,12 @@ describe('useErrorHandler', () => {
       const res = await result.current.executeWithErrorHandling(async () => { throw wrap(400, undefined, 'Bad Request') })
       expect(res).toBeNull()
       expect(onValidationError).toHaveBeenCalled()
-      expect(result.current.errorMessage).toBeTruthy()
-      jest.advanceTimersByTime(5000)
-      expect(result.current.errorMessage).toBeNull()
     })
+    expect(result.current.errorMessage).toBeTruthy()
+    act(() => {
+      jest.advanceTimersByTime(5000)
+    })
+    expect(result.current.errorMessage).toBeNull()
   })
 })
 
