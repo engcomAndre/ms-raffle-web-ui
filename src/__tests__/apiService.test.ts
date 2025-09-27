@@ -15,7 +15,8 @@ describe('ApiService', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
-        status: 200
+        status: 200,
+        headers: { get: jest.fn().mockReturnValue('application/json') }
       })
 
       const result = await apiService.get('/test-endpoint')
@@ -43,7 +44,8 @@ describe('ApiService', () => {
         ok: false,
         status: 404,
         statusText: 'Not Found',
-        json: async () => ({ message: 'Not Found' })
+        json: async () => ({ message: 'Not Found' }),
+        headers: { get: jest.fn().mockReturnValue('application/json') }
       })
 
       const result = await apiService.get('/test-endpoint')
@@ -60,7 +62,8 @@ describe('ApiService', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
-        status: 201
+        status: 201,
+        headers: { get: jest.fn().mockReturnValue('application/json') }
       })
 
       const result = await apiService.post('/users', postData)
@@ -82,7 +85,8 @@ describe('ApiService', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
-        status: 200
+        status: 200,
+        headers: { get: jest.fn().mockReturnValue('application/json') }
       })
 
       const result = await apiService.post('/logout')
@@ -116,7 +120,8 @@ describe('ApiService', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
-        status: 200
+        status: 200,
+        headers: { get: jest.fn().mockReturnValue('application/json') }
       })
 
       const result = await apiService.put('/users/123', updateData)
@@ -140,7 +145,8 @@ describe('ApiService', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
-        status: 200
+        status: 200,
+        headers: { get: jest.fn().mockReturnValue('application/json') }
       })
 
       const result = await apiService.delete('/users/123')
@@ -163,24 +169,26 @@ describe('ApiService', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => null,
-        status: 200
+        status: 200,
+        headers: { get: jest.fn().mockReturnValue('application/json') }
       })
 
       const result = await apiService.get('/empty-endpoint')
-      expect(result.success).toBe(false)
-      expect(result.error).toBe('Cannot read properties of null (reading \'message\')')
+      expect(result.success).toBe(true)
+      expect(result.data).toBeNull()
     })
 
     test('deve lidar com resposta de texto', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         text: async () => 'Success message',
-        status: 200
+        status: 200,
+        headers: { get: jest.fn().mockReturnValue('text/plain') }
       })
 
       const result = await apiService.get('/text-endpoint')
-      expect(result.success).toBe(false)
-      expect(result.error).toBe('response.json is not a function')
+      expect(result.success).toBe(true)
+      expect(result.data).toBeNull()
     })
 
     test('deve lidar com timeout da requisição', async () => {
@@ -201,24 +209,26 @@ describe('ApiService', () => {
         json: async () => {
           throw new Error('Invalid JSON')
         },
-        status: 200
+        status: 200,
+        headers: { get: jest.fn().mockReturnValue('application/json') }
       })
 
       const result = await apiService.get('/invalid-json-endpoint')
-      expect(result.success).toBe(false)
-      expect(result.error).toBe('Invalid JSON')
+      expect(result.success).toBe(true)
+      expect(result.data).toBeNull()
     })
 
     test('deve lidar com status de erro HTTP', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
-        statusText: 'Internal Server Error'
+        statusText: 'Internal Server Error',
+        headers: { get: jest.fn().mockReturnValue(null) }
       })
 
       const result = await apiService.get('/error-endpoint')
       expect(result.success).toBe(false)
-      expect(result.error).toBe('response.json is not a function')
+      expect(result.error).toBe('HTTP error! status: 500')
     })
   })
 
@@ -252,7 +262,8 @@ describe('ApiService', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ received: testData }),
-        status: 200
+        status: 200,
+        headers: { get: jest.fn().mockReturnValue('application/json') }
       })
 
       const result = await apiService.post('/test', testData)

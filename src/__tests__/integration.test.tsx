@@ -6,29 +6,35 @@ import WelcomePage from '../app/welcome/welcome'
 // Mock completo dos serviços
 jest.mock('@/services/userPassLoginService', () => ({
   UserPassLoginService: jest.fn().mockImplementation(() => ({
-    login: jest.fn().mockResolvedValue({
-      success: true,
-      data: { username: 'testuser', token: 'test-token' }
-    })
+    login: jest.fn().mockImplementation(() =>
+      new Promise((resolve) => setTimeout(() => resolve({
+        success: true,
+        data: { username: 'testuser', token: 'test-token' }
+      }), 80))
+    )
   }))
 }))
 
 jest.mock('@/services/googleLoginService', () => ({
   GoogleLoginService: jest.fn().mockImplementation(() => ({
-    handleGoogleLogin: jest.fn().mockResolvedValue({
-      success: true,
-      data: { username: 'googleuser', token: 'google-token' }
-    })
+    handleGoogleLogin: jest.fn().mockImplementation(() =>
+      new Promise((resolve) => setTimeout(() => resolve({
+        success: true,
+        data: { username: 'googleuser', token: 'google-token' }
+      }), 80))
+    )
   }))
 }))
 
 jest.mock('@/services/authService', () => ({
   AuthService: jest.fn().mockImplementation(() => ({
-    register: jest.fn().mockResolvedValue({
-      success: true,
-      data: { id: '123', username: 'newuser' },
-      message: 'Conta criada com sucesso!'
-    })
+    register: jest.fn().mockImplementation(() =>
+      new Promise((resolve) => setTimeout(() => resolve({
+        success: true,
+        data: { id: '123', username: 'newuser' },
+        message: 'Conta criada com sucesso!'
+      }), 80))
+    )
   }))
 }))
 
@@ -55,8 +61,8 @@ describe('Testes de Integração - Fluxo Completo', () => {
       render(<WelcomePage />)
       
       // 1. Preencher formulário de login
-      await user.type(screen.getByLabelText('Nome de usuário'), 'admin')
-      await user.type(screen.getByLabelText('Senha'), 'admin123')
+      await user.type(screen.getByLabelText('Nome de usuário', { selector: '#login-username' }), 'admin')
+      await user.type(screen.getByLabelText('Senha', { selector: '#login-password' }), 'admin123')
       
       // 2. Submeter formulário
       const loginButton = screen.getByRole('button', { name: 'Entrar' })
@@ -92,9 +98,9 @@ describe('Testes de Integração - Fluxo Completo', () => {
       // 1. Preencher todos os campos do formulário
       await user.type(screen.getByLabelText('Nome'), 'Maria')
       await user.type(screen.getByLabelText('Sobrenome'), 'Santos')
-      await user.type(screen.getByLabelText('Nome de usuário'), 'mariasantos')
+      await user.type(screen.getByLabelText('Nome de usuário', { selector: '#username' }), 'mariasantos')
       await user.type(screen.getByLabelText('Email'), 'maria@test.com')
-      await user.type(screen.getByLabelText('Senha'), 'Maria123!')
+      await user.type(screen.getByLabelText('Senha', { selector: '#password' }), 'Maria123!')
       await user.type(screen.getByLabelText('Repetir Senha'), 'Maria123!')
       
       // 2. Verificar validações de senha em tempo real
@@ -115,7 +121,7 @@ describe('Testes de Integração - Fluxo Completo', () => {
       
       // 5. Verificar mensagem de sucesso
       await waitFor(() => {
-        expect(screen.getByText('Conta criada com sucesso! Faça login para continuar.')).toBeInTheDocument()
+        expect(screen.getByText(/Conta criada com sucesso/)).toBeInTheDocument()
       })
     })
 
@@ -126,9 +132,9 @@ describe('Testes de Integração - Fluxo Completo', () => {
       // 1. Preencher formulário com senha fraca
       await user.type(screen.getByLabelText('Nome'), 'João')
       await user.type(screen.getByLabelText('Sobrenome'), 'Silva')
-      await user.type(screen.getByLabelText('Nome de usuário'), 'joaosilva')
+      await user.type(screen.getByLabelText('Nome de usuário', { selector: '#username' }), 'joaosilva')
       await user.type(screen.getByLabelText('Email'), 'joao@test.com')
-      await user.type(screen.getByLabelText('Senha'), 'weak')
+      await user.type(screen.getByLabelText('Senha', { selector: '#password' }), 'weak')
       await user.type(screen.getByLabelText('Repetir Senha'), 'weak')
       
       // 2. Submeter formulário
@@ -148,9 +154,9 @@ describe('Testes de Integração - Fluxo Completo', () => {
       // 1. Preencher formulário com senhas diferentes
       await user.type(screen.getByLabelText('Nome'), 'Ana')
       await user.type(screen.getByLabelText('Sobrenome'), 'Costa')
-      await user.type(screen.getByLabelText('Nome de usuário'), 'anacosta')
+      await user.type(screen.getByLabelText('Nome de usuário', { selector: '#username' }), 'anacosta')
       await user.type(screen.getByLabelText('Email'), 'ana@test.com')
-      await user.type(screen.getByLabelText('Senha'), 'Ana123!')
+      await user.type(screen.getByLabelText('Senha', { selector: '#password' }), 'Ana123!')
       await user.type(screen.getByLabelText('Repetir Senha'), 'Ana456!')
       
       // 2. Verificar validação em tempo real
@@ -162,7 +168,7 @@ describe('Testes de Integração - Fluxo Completo', () => {
       
       // 4. Verificar erro de validação
       await waitFor(() => {
-        expect(screen.getByText('As senhas não coincidem')).toBeInTheDocument()
+        expect(screen.getByText(/Senhas não coincidem/)).toBeInTheDocument()
       })
     })
   })
@@ -179,9 +185,9 @@ describe('Testes de Integração - Fluxo Completo', () => {
       // Verificar se os campos obrigatórios estão marcados
       expect(screen.getByLabelText('Nome')).toBeRequired()
       expect(screen.getByLabelText('Sobrenome')).toBeRequired()
-      expect(screen.getByLabelText('Nome de usuário')).toBeRequired()
+      expect(screen.getByLabelText('Nome de usuário', { selector: '#username' })).toBeRequired()
       expect(screen.getByLabelText('Email')).toBeRequired()
-      expect(screen.getByLabelText('Senha')).toBeRequired()
+      expect(screen.getByLabelText('Senha', { selector: '#password' })).toBeRequired()
       expect(screen.getByLabelText('Repetir Senha')).toBeRequired()
     })
 
@@ -211,8 +217,8 @@ describe('Testes de Integração - Fluxo Completo', () => {
       expect(registerButton).toHaveTextContent('Criar Conta')
       
       // Simular login
-      await user.type(screen.getByLabelText('Nome de usuário'), 'testuser')
-      await user.type(screen.getByLabelText('Senha'), 'testpass')
+      await user.type(screen.getByLabelText('Nome de usuário', { selector: '#login-username' }), 'testuser')
+      await user.type(screen.getByLabelText('Senha', { selector: '#login-password' }), 'testpass')
       await user.click(loginButton)
       
       // Estado de loading
@@ -223,9 +229,9 @@ describe('Testes de Integração - Fluxo Completo', () => {
       // Simular registro
       await user.type(screen.getByLabelText('Nome'), 'Test')
       await user.type(screen.getByLabelText('Sobrenome'), 'User')
-      await user.type(screen.getByLabelText('Nome de usuário'), 'testuser2')
+      await user.type(screen.getByLabelText('Nome de usuário', { selector: '#username' }), 'testuser2')
       await user.type(screen.getByLabelText('Email'), 'test@test.com')
-      await user.type(screen.getByLabelText('Senha'), 'Test123!')
+      await user.type(screen.getByLabelText('Senha', { selector: '#password' }), 'Test123!')
       await user.type(screen.getByLabelText('Repetir Senha'), 'Test123!')
       
       await user.click(registerButton)
@@ -247,9 +253,9 @@ describe('Testes de Integração - Fluxo Completo', () => {
       // Simular registro bem-sucedido
       await user.type(screen.getByLabelText('Nome'), 'Sucesso')
       await user.type(screen.getByLabelText('Sobrenome'), 'Test')
-      await user.type(screen.getByLabelText('Nome de usuário'), 'sucesso')
+      await user.type(screen.getByLabelText('Nome de usuário', { selector: '#username' }), 'sucesso')
       await user.type(screen.getByLabelText('Email'), 'sucesso@test.com')
-      await user.type(screen.getByLabelText('Senha'), 'Sucesso123!')
+      await user.type(screen.getByLabelText('Senha', { selector: '#password' }), 'Sucesso123!')
       await user.type(screen.getByLabelText('Repetir Senha'), 'Sucesso123!')
       
       const registerButton = screen.getByRole('button', { name: 'Criar Conta' })

@@ -23,3 +23,5 @@ describe('RaffleNumberLegend', () => {
     expect(indicators[2]).toHaveClass('bg-gray-100', 'border-gray-300')
   })
 })
+
+

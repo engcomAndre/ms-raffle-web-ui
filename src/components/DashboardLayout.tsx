@@ -178,6 +178,7 @@ export function DashboardLayout({ children, currentPage = 'Minhas Rifas' }: Dash
         <div 
           className="fixed inset-0 z-40" 
           onClick={() => setDropdownOpen(false)}
+          data-testid="overlay"
         ></div>
       )}
     </div>

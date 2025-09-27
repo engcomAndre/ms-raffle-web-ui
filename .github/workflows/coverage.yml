@@ -40,16 +40,11 @@ jobs:
         fail_ci_if_error: false
         
     - name: Upload coverage artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-reports
         path: |
           coverage/
           coverage.lcov
           
-    - name: Comment PR with coverage
-      if: github.event_name == 'pull_request'
-      uses: romeovs/lcov-reporter-action@v0.3.0
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        lcov-file: ./coverage/lcov.info
+    # Coverage comments are handled automatically by Codecov

@@ -4,7 +4,9 @@ import { apiService } from '../services/api'
 // Mock do apiService
 jest.mock('../services/api', () => ({
   apiService: {
-    post: jest.fn()
+    post: jest.fn(),
+    register: jest.fn(),
+    login: jest.fn()
   }
 }))
 
@@ -41,11 +43,11 @@ describe('AuthService', () => {
         message: 'Usuário registrado com sucesso'
       }
 
-      mockApiService.post.mockResolvedValue(mockResponse)
+      mockApiService.register.mockResolvedValue(mockResponse)
 
       const result = await authService.register(mockUserData)
 
-      expect(mockApiService.post).toHaveBeenCalledWith(
+      expect(mockApiService.register).toHaveBeenCalledWith(
         expect.any(String),
         mockUserData
       )
@@ -60,7 +62,7 @@ describe('AuthService', () => {
         data: null
       }
 
-      mockApiService.post.mockResolvedValue(mockError)
+      mockApiService.register.mockResolvedValue(mockError)
 
       const result = await authService.register(mockUserData)
 
@@ -69,7 +71,7 @@ describe('AuthService', () => {
     })
 
     test('deve lidar com exceção durante registro', async () => {
-      mockApiService.post.mockRejectedValue(new Error('Erro de rede'))
+      mockApiService.register.mockRejectedValue(new Error('Erro de rede'))
 
       await expect(authService.register(mockUserData)).rejects.toThrow('Erro de rede')
     })
@@ -97,11 +99,11 @@ describe('AuthService', () => {
         message: 'Usuário externo registrado'
       }
 
-      mockApiService.post.mockResolvedValue(mockResponse)
+      mockApiService.register.mockResolvedValue(mockResponse)
 
       const result = await authService.registerExternalUser(mockExternalUserData)
 
-      expect(mockApiService.post).toHaveBeenCalledWith(
+      expect(mockApiService.register).toHaveBeenCalledWith(
         expect.any(String),
         mockExternalUserData
       )
@@ -123,7 +125,7 @@ describe('AuthService', () => {
         message: 'Usuário externo já existe'
       }
 
-      mockApiService.post.mockResolvedValue(mockResponse)
+      mockApiService.register.mockResolvedValue(mockResponse)
 
       const result = await authService.registerExternalUser(mockExternalUserData)
 
@@ -154,11 +156,11 @@ describe('AuthService', () => {
         message: 'Login realizado com sucesso'
       }
 
-      mockApiService.post.mockResolvedValue(mockResponse)
+      mockApiService.login.mockResolvedValue(mockResponse)
 
       const result = await authService.login(mockLoginData)
 
-      expect(mockApiService.post).toHaveBeenCalledWith(
+      expect(mockApiService.login).toHaveBeenCalledWith(
         expect.any(String),
         mockLoginData
       )
@@ -174,7 +176,7 @@ describe('AuthService', () => {
         data: null
       }
 
-      mockApiService.post.mockResolvedValue(mockError)
+      mockApiService.login.mockResolvedValue(mockError)
 
       const result = await authService.login(mockLoginData)
 
@@ -183,7 +185,7 @@ describe('AuthService', () => {
     })
 
     test('deve lidar com erro de rede durante login', async () => {
-      mockApiService.post.mockRejectedValue(new Error('Erro de conexão'))
+      mockApiService.login.mockRejectedValue(new Error('Erro de conexão'))
 
       await expect(authService.login(mockLoginData)).rejects.toThrow('Erro de conexão')
     })

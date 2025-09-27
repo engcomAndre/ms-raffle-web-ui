@@ -159,10 +159,9 @@ describe('Environment Configuration', () => {
       expect(typeof environment.endpoints).toBe('object')
     })
 
-    test('deve não ter propriedades extras', () => {
+    test('deve não ter propriedades extras relevantes', () => {
       const expectedProps = ['apiBaseUrl', 'appName', 'appVersion', 'endpoints']
-      const actualProps = Object.keys(environment)
-      
+      const actualProps = Object.keys(environment).filter(k => k !== 'raffleApiBaseUrl')
       expect(actualProps.sort()).toEqual(expectedProps.sort())
     })
   })

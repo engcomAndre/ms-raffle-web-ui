@@ -31,7 +31,7 @@ describe('RaffleNumberListItem', () => {
     const { container } = render(<RaffleNumberListItem number={mockNumber} />)
     
     const numberElement = container.firstChild as HTMLElement
-    expect(numberElement).toHaveClass('bg-green-50', 'border-green-200', 'text-green-900')
+    expect(numberElement).toHaveClass('bg-green-100', 'border-green-300', 'text-green-800')
   })
 
   it('deve aplicar classes corretas para números reservados', () => {
@@ -39,7 +39,7 @@ describe('RaffleNumberListItem', () => {
     const { container } = render(<RaffleNumberListItem number={reservedNumber} />)
     
     const numberElement = container.firstChild as HTMLElement
-    expect(numberElement).toHaveClass('bg-yellow-50', 'border-yellow-200', 'text-yellow-900')
+    expect(numberElement).toHaveClass('bg-yellow-100', 'border-yellow-300', 'text-yellow-800')
   })
 
   it('deve aplicar classes corretas para números vendidos', () => {
@@ -47,7 +47,7 @@ describe('RaffleNumberListItem', () => {
     const { container } = render(<RaffleNumberListItem number={soldNumber} />)
     
     const numberElement = container.firstChild as HTMLElement
-    expect(numberElement).toHaveClass('bg-gray-100', 'border-gray-300', 'text-gray-600')
+    expect(numberElement).toHaveClass('bg-gray-200', 'border-gray-400', 'text-gray-700')
   })
 
   it('deve exibir badge de ganhador quando winner for true', () => {

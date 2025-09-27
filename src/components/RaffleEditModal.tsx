@@ -108,6 +108,7 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
       <div 
         className="fixed inset-0 bg-transparent backdrop-blur-sm transition-opacity"
         onClick={handleClose}
+        data-testid="overlay"
       />
       
       {/* Modal */}
@@ -122,6 +123,7 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
               onClick={handleClose}
               disabled={isLoading}
               className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
+              aria-label="Fechar modal"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
