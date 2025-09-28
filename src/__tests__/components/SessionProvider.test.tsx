@@ -87,9 +87,9 @@ describe('SessionProvider', () => {
     // The modal should be rendered with the correct props
     expect(screen.getByText('Sessão Expirada')).toBeInTheDocument()
     
-    // Test that the close handler is passed correctly by clicking the manual login button
-    const loginButton = screen.getByText('Ir para Login Agora')
-    loginButton.click()
+    // Test that the close handler is passed correctly by clicking the manual welcome button
+    const welcomeButton = screen.getByText('Ir para Welcome Agora')
+    welcomeButton.click()
     
     // The handleCloseModal should be called when the modal is closed
     // This is tested in the SessionExpiredModal component tests
