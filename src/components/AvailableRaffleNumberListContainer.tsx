@@ -23,46 +23,12 @@ export function AvailableRaffleNumberListContainer({
   onReserveNumber
 }: AvailableRaffleNumberListContainerProps) {
   const [numbers, setNumbers] = useState<RaffleNumberItemResponse[]>([])
-  const [filteredNumbers, setFilteredNumbers] = useState<RaffleNumberItemResponse[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
   const [currentPageSize, setCurrentPageSize] = useState(pageSize)
-  const [currentUser, setCurrentUser] = useState<string | null>(null)
-
-  // Obter usuário logado
-  useEffect(() => {
-    const username = localStorage.getItem('auth-username')
-    setCurrentUser(username)
-  }, [])
-
-  // Filtrar números para mostrar apenas disponíveis e do usuário logado
-  useEffect(() => {
-    if (!currentUser) return
-
-    const filtered = numbers.filter(numberItem => {
-      // Sempre mostrar números disponíveis (ACTIVE)
-      if (numberItem.status === 'ACTIVE') {
-        return true
-      }
-      
-      // Mostrar números reservados pelo usuário logado
-      if (numberItem.status === 'RESERVED' && numberItem.reservedBy === currentUser) {
-        return true
-      }
-      
-      // Mostrar números comprados pelo usuário logado
-      if (numberItem.status === 'SOLD' && (numberItem.buyerName === currentUser || numberItem.owner === currentUser)) {
-        return true
-      }
-      
-      return false
-    })
-
-    setFilteredNumbers(filtered)
-  }, [numbers, currentUser])
 
   const loadNumbers = async (page: number = 0, size: number = currentPageSize) => {
     try {
@@ -139,7 +105,7 @@ export function AvailableRaffleNumberListContainer({
       {/* Lista de números */}
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
         <AvailableRaffleNumberList
-          numbers={filteredNumbers}
+          numbers={numbers}
           raffleId={raffleId}
           isLoading={isLoading}
           error={error}
@@ -153,7 +119,7 @@ export function AvailableRaffleNumberListContainer({
         <RaffleNumberListPagination
           currentPage={currentPage}
           totalPages={totalPages}
-          totalElements={filteredNumbers.length}
+          totalElements={totalElements}
           pageSize={currentPageSize}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
@@ -161,14 +127,14 @@ export function AvailableRaffleNumberListContainer({
       )}
 
       {/* Aviso sobre funcionalidades limitadas */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
         <div className="flex items-center">
-          <svg className="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <div className="text-sm text-blue-800">
-            <p className="font-medium">Números Disponíveis</p>
-            <p className="text-xs">Mostrando apenas números disponíveis para reserva e seus números reservados/comprados.</p>
+          <div className="text-sm text-yellow-800">
+            <p className="font-medium">Modo de Visualização</p>
+            <p className="text-xs">Você pode visualizar os números, mas não pode editá-los ou excluí-los.</p>
           </div>
         </div>
       </div>
