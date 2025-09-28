@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { GoogleScript } from "@/components/GoogleScript";
 import SessionProvider from "@/components/SessionProvider";
+import TokenTimeoutProvider from "@/components/TokenTimeoutProvider";
 
 export const metadata: Metadata = {
   title: "MS Raffle - Sistema de Gerenciamento de Rifas",
@@ -32,7 +33,9 @@ export default function RootLayout({
       <body className="antialiased">
         <GoogleScript />
         <SessionProvider>
-          {children}
+          <TokenTimeoutProvider>
+            {children}
+          </TokenTimeoutProvider>
         </SessionProvider>
       </body>
     </html>
