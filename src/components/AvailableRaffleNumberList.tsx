@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { RaffleNumberItemResponse, RaffleResponse } from '@/types/raffle'
 import { AvailableRaffleNumberListItem } from './AvailableRaffleNumberListItem'
 import { Toast } from './Toast'
@@ -25,6 +25,33 @@ export function AvailableRaffleNumberList({
   onReserveError
 }: AvailableRaffleNumberListProps) {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' | 'info' } | null>(null)
+  const [currentUser, setCurrentUser] = useState<string | null>(null)
+
+  // Obter usuário logado
+  useEffect(() => {
+    const username = localStorage.getItem('auth-username')
+    setCurrentUser(username)
+  }, [])
+
+  // Filtrar números para mostrar apenas disponíveis e do usuário logado
+  const filteredNumbers = numbers.filter(numberItem => {
+    // Sempre mostrar números disponíveis (ACTIVE)
+    if (numberItem.status === 'ACTIVE') {
+      return true
+    }
+    
+    // Mostrar números reservados pelo usuário logado
+    if (numberItem.status === 'RESERVED' && numberItem.reservedBy === currentUser) {
+      return true
+    }
+    
+    // Mostrar números comprados pelo usuário logado
+    if (numberItem.status === 'SOLD' && (numberItem.buyerName === currentUser || numberItem.owner === currentUser)) {
+      return true
+    }
+    
+    return false
+  })
 
   const handleReserveSuccess = (number: number) => {
     setToast({
@@ -64,7 +91,7 @@ export function AvailableRaffleNumberList({
     )
   }
 
-  if (numbers.length === 0) {
+  if (filteredNumbers.length === 0) {
     return (
       <div className="text-center py-6">
         <div className="text-gray-400 mb-2">
@@ -72,17 +99,19 @@ export function AvailableRaffleNumberList({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
         </div>
-        <p className="text-sm text-gray-500">{emptyMessage}</p>
+        <p className="text-sm text-gray-500">
+          {numbers.length === 0 ? emptyMessage : 'Nenhum número disponível para você nesta rifa.'}
+        </p>
       </div>
     )
   }
 
-  console.log('🔢 [AVAILABLE-NUMBER-LIST] Renderizando números:', numbers.length, 'números')
+  console.log('🔢 [AVAILABLE-NUMBER-LIST] Renderizando números:', filteredNumbers.length, 'números filtrados de', numbers.length, 'total')
 
   return (
     <>
       <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2">
-        {numbers.map((numberItem) => (
+        {filteredNumbers.map((numberItem) => (
           <AvailableRaffleNumberListItem
             key={numberItem.number}
             numberItem={numberItem}
