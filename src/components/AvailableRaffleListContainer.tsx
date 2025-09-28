@@ -32,7 +32,10 @@ export function AvailableRaffleListContainer({ className = '' }: AvailableRaffle
 
   const handlePageChange = (page: number) => {
     console.log('🔄 [AVAILABLE-RAFFLE-CONTAINER] Mudança de página solicitada:', page)
-    setCurrentPage(page)
+    // Garantir que a página não seja negativa e não exceda o total de páginas
+    const validPage = Math.max(0, Math.min(page, totalPages - 1))
+    console.log('🔄 [AVAILABLE-RAFFLE-CONTAINER] Página válida calculada:', validPage)
+    setCurrentPage(validPage)
   }
 
   const handleSearchChange = (search: string) => {
