@@ -26,6 +26,13 @@ export const AvailableRaffleList = forwardRef<AvailableRaffleListRef, AvailableR
   onRefresh,
   onDataChange
 }, ref) => {
+  // Debug logs
+  console.log('🔍 [AVAILABLE-RAFFLE-LIST] Props recebidas:', {
+    currentPage,
+    pageSize,
+    searchTerm,
+    statusFilter
+  })
   const [allRaffles, setAllRaffles] = useState<RaffleResponse[]>([])
   const [filteredRaffles, setFilteredRaffles] = useState<RaffleResponse[]>([])
   const [isLoading, setIsLoading] = useState(true)

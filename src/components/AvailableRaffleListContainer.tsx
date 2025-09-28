@@ -31,6 +31,7 @@ export function AvailableRaffleListContainer({ className = '' }: AvailableRaffle
   }
 
   const handlePageChange = (page: number) => {
+    console.log('🔄 [AVAILABLE-RAFFLE-CONTAINER] Mudança de página solicitada:', page)
     setCurrentPage(page)
   }
 
