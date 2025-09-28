@@ -126,18 +126,6 @@ export function AvailableRaffleNumberListContainer({
         />
       )}
 
-      {/* Aviso sobre funcionalidades limitadas */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <div className="flex items-center">
-          <svg className="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div className="text-sm text-yellow-800">
-            <p className="font-medium">Modo de Visualização</p>
-            <p className="text-xs">Você pode visualizar os números, mas não pode editá-los ou excluí-los.</p>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }
