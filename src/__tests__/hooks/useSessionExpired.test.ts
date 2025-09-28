@@ -228,4 +228,42 @@ describe('useSessionExpired', () => {
     expect(result.current.isSessionExpired).toBe(false)
     expect(result.current.showSessionExpiredModal).toBe(false)
   })
+
+  it('should detect CORS errors on API endpoints and trigger session expired', async () => {
+    const { result } = renderHook(() => useSessionExpired())
+    
+    // Mock a CORS error (Failed to fetch)
+    mockFetch.mockRejectedValueOnce(new TypeError('Failed to fetch'))
+    
+    await act(async () => {
+      try {
+        await fetch('http://localhost:8081/v1/raffles/test')
+      } catch (error) {
+        // Expected to throw
+      }
+    })
+    
+    // Should trigger session expired for CORS errors on API endpoints
+    expect(result.current.isSessionExpired).toBe(true)
+    expect(result.current.showSessionExpiredModal).toBe(true)
+  })
+
+  it('should not trigger session expired for CORS errors on non-API endpoints', async () => {
+    const { result } = renderHook(() => useSessionExpired())
+    
+    // Mock a CORS error (Failed to fetch)
+    mockFetch.mockRejectedValueOnce(new TypeError('Failed to fetch'))
+    
+    await act(async () => {
+      try {
+        await fetch('http://external-site.com/api/test')
+      } catch (error) {
+        // Expected to throw
+      }
+    })
+    
+    // Should not trigger session expired for CORS errors on non-API endpoints
+    expect(result.current.isSessionExpired).toBe(false)
+    expect(result.current.showSessionExpiredModal).toBe(false)
+  })
 })

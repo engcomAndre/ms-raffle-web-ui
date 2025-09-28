@@ -165,6 +165,21 @@ export class ApiService {
       }
     } catch (error) {
       console.log(`💥 [API] Erro durante a requisição:`, error)
+      
+      // Check if it's a CORS error that might indicate 401
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        console.log(`🔐 [API] CORS error detected, likely token expired`)
+        // Clear auth data on CORS error (likely 401)
+        useAuthStore.getState().logout()
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('auth-token')
+          localStorage.removeItem('auth-username')
+          localStorage.removeItem('auth-email')
+          localStorage.removeItem('auth-provider')
+          localStorage.removeItem('google-user-picture')
+        }
+      }
+      
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Erro desconhecido',

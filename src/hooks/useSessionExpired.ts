@@ -14,7 +14,6 @@ export function useSessionExpired(): UseSessionExpiredReturn {
   const [showSessionExpiredModal, setShowSessionExpiredModal] = useState(false)
 
   const handleSessionExpired = useCallback(() => {
-    console.log('🔐 [SESSION] Session expired detected - showing modal')
     setIsSessionExpired(true)
     setShowSessionExpiredModal(true)
     
@@ -41,44 +40,23 @@ export function useSessionExpired(): UseSessionExpiredReturn {
         
         // Check for 401 Unauthorized
         if (response.status === 401) {
-          // Check if it's a token-related error
-          const contentType = response.headers.get('content-type')
-          if (contentType && contentType.includes('application/json')) {
-            try {
-              const errorData = await response.clone().json()
-              // Check for common token expiration error messages
-              if (
-                errorData.message?.toLowerCase().includes('token') ||
-                errorData.message?.toLowerCase().includes('expired') ||
-                errorData.message?.toLowerCase().includes('invalid') ||
-                errorData.message?.toLowerCase().includes('unauthorized')
-              ) {
-                handleSessionExpired()
-              }
-            } catch {
-              // If we can't parse JSON, still treat 401 as session expired
-              handleSessionExpired()
-            }
-          } else {
-            // If not JSON, treat 401 as session expired
-            handleSessionExpired()
-          }
+          console.log('🔐 [SESSION-EXPIRED] 401 detected, triggering session expired')
+          handleSessionExpired()
         }
         
         return response
       } catch (error) {
-        // Check if it's a CORS error or network error that might indicate session expired
-        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-          // This could be a CORS error due to expired token
-          // Check if we have a token in localStorage
-          const token = localStorage.getItem('auth-token')
-          if (token) {
-            // If we have a token but getting CORS errors, likely session expired
-            console.log('🔐 [SESSION] CORS error with token present - likely session expired')
+        // Check if it's a CORS error that might indicate 401
+        if (error instanceof TypeError && error.message === 'Failed to fetch') {
+          // Check if the URL contains our API endpoint
+          const url = args[0]?.toString() || ''
+          if (url.includes('localhost:8081') || url.includes('/v1/')) {
+            console.log('🔐 [SESSION-EXPIRED] CORS error on API endpoint, likely 401 - triggering session expired')
             handleSessionExpired()
           }
         }
-        // If fetch fails completely, re-throw the error
+        
+        // Re-throw the error
         throw error
       }
     }

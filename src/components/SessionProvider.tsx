@@ -10,8 +10,6 @@ interface SessionProviderProps {
 export default function SessionProvider({ children }: SessionProviderProps) {
   const { showSessionExpiredModal, handleCloseModal } = useSessionExpired()
 
-  console.log('🔐 [SESSION-PROVIDER] showSessionExpiredModal:', showSessionExpiredModal)
-
   return (
     <>
       {children}
