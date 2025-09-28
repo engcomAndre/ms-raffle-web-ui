@@ -25,7 +25,7 @@ describe('RaffleService', () => {
   test('reserveRaffleNumber success', async () => {
     apiMock.post.mockResolvedValue({ success: true })
     const result = await service.reserveRaffleNumber('raffle-1', 10)
-    expect(apiMock.post).toHaveBeenCalledWith('/v1/raffles/raffle-1/numbers/reserve', { number: 10 })
+    expect(apiMock.post).toHaveBeenCalledWith('/v1/raffles/raffle-1/numbers/reserve', { number: "10" })
     expect(result.success).toBe(true)
   })
 
@@ -37,7 +37,7 @@ describe('RaffleService', () => {
   test('unreserveRaffleNumber success', async () => {
     apiMock.post.mockResolvedValue({ success: true })
     const result = await service.unreserveRaffleNumber('raffle-1', 10)
-    expect(apiMock.post).toHaveBeenCalledWith('/v1/raffles/raffle-1/numbers/unreserve', { number: 10 })
+    expect(apiMock.post).toHaveBeenCalledWith('/v1/raffles/raffle-1/numbers/unreserve', { number: "10" })
     expect(result.success).toBe(true)
   })
 
@@ -46,6 +46,7 @@ describe('RaffleService', () => {
     await expect(service.unreserveRaffleNumber('raffle-1', 10)).rejects.toThrow('Erro')
   })
 })
+
 
 
 

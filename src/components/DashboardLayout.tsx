@@ -30,9 +30,9 @@ export function DashboardLayout({ children, currentPage = 'Minhas Rifas' }: Dash
     
     if (token && username) {
       setUser({
-        name: username,
+        username: username,
         email: email || username,
-        picture: picture || null,
+        picture: picture || '',
         provider: provider || 'userpass'
       })
     }
@@ -68,14 +68,14 @@ export function DashboardLayout({ children, currentPage = 'Minhas Rifas' }: Dash
                 {user?.picture ? (
                   <Image
                     src={user.picture}
-                    alt={user.name || 'User'}
+                    alt={user.username || 'User'}
                     width={32}
                     height={32}
                     className="w-8 h-8 rounded-full object-cover"
                   />
                 ) : (
                   <span className="text-sm font-medium text-gray-600">
-                    {user?.name?.charAt(0) || 'U'}
+                    {user?.username?.charAt(0) || 'U'}
                   </span>
                 )}
               </div>
@@ -83,7 +83,7 @@ export function DashboardLayout({ children, currentPage = 'Minhas Rifas' }: Dash
               {/* Nome do usuário */}
               <div className="hidden md:block text-left">
                 <p className="text-sm font-medium text-gray-900">
-                  {user?.name || 'Usuário'}
+                  {user?.username || 'Usuário'}
                 </p>
                 <p className="text-xs text-gray-500">
                   {user?.email || 'usuario@email.com'}

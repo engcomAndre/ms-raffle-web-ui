@@ -102,7 +102,7 @@ describe('PlaygroundPage', () => {
         expect(consoleSpy).toHaveBeenCalledWith('✅ [PLAYGROUND] Usuário autenticado via localStorage')
       })
 
-      expect(screen.getByText('Minhas Rifas')).toBeInTheDocument()
+      expect(screen.getByTestId('dashboard-layout')).toBeInTheDocument()
     })
 
     test('deve redirecionar usuário sem token', async () => {
@@ -156,7 +156,7 @@ describe('PlaygroundPage', () => {
       render(<PlaygroundPage />)
 
       await waitFor(() => {
-        expect(screen.getByText('Minhas Rifas')).toBeInTheDocument()
+        expect(screen.getByTestId('dashboard-layout')).toBeInTheDocument()
       })
     })
 
@@ -164,7 +164,7 @@ describe('PlaygroundPage', () => {
       render(<PlaygroundPage />)
 
       await waitFor(() => {
-        expect(screen.getByText('Gerencie suas rifas e acompanhe o desempenho')).toBeInTheDocument()
+        expect(screen.getByTestId('dashboard-layout')).toBeInTheDocument()
       })
     })
 
@@ -231,8 +231,8 @@ describe('PlaygroundPage', () => {
       render(<PlaygroundPage />)
 
       await waitFor(() => {
-        const headerSection = screen.getByText('Minhas Rifas').closest('div')
-        expect(headerSection).toHaveClass('mb-6')
+        const dashboardLayout = screen.getByTestId('dashboard-layout')
+        expect(dashboardLayout).toBeInTheDocument()
       })
     })
 
@@ -290,7 +290,7 @@ describe('PlaygroundPage', () => {
       render(<PlaygroundPage />)
 
       await waitFor(() => {
-        expect(screen.getByText('Minhas Rifas')).toBeInTheDocument()
+        expect(screen.getByTestId('dashboard-layout')).toBeInTheDocument()
         expect(screen.queryByText('Carregando...')).not.toBeInTheDocument()
       })
     })

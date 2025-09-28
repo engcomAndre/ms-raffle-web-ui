@@ -204,3 +204,4 @@ export function ReserveNumberButton({ raffleId, number }) {
 6. **Flexibilidade**: Callbacks personalizáveis para diferentes tipos de erro
 
 
+
