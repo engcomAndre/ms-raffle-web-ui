@@ -278,3 +278,4 @@ A solução implementada resolve completamente o problema do timeout de token, p
 5. **Segurança**: Limpeza automática de dados sensíveis
 
 A implementação segue as melhores práticas de desenvolvimento React/Next.js e garante uma experiência de usuário superior com máxima segurança.
+

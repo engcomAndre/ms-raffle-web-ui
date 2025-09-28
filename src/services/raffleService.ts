@@ -98,6 +98,18 @@ export class RaffleService {
   }
 
   /**
+   * Lista rifas públicas (de outros usuários) com paginação
+   */
+  async getPublicRafflesWithPagination(page: number = 0, size: number = 10): Promise<ApiResponse<RafflePageResponse>> {
+    console.log(`🌐 [RAFFLE] Buscando rifas públicas com paginação - página ${page}, tamanho ${size}`)
+    
+    const response = await this.raffleApiService.get<RafflePageResponse>(`/v1/raffles/public/page?page=${page}&size=${size}`)
+    
+    console.log('📊 [RAFFLE] Página de rifas públicas encontrada:', response)
+    return response
+  }
+
+  /**
    * Ativa uma rifa
    */
   async activeRaffle(id: string): Promise<ApiResponse<any>> {
