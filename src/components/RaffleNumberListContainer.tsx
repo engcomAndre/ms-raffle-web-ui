@@ -6,6 +6,7 @@ import { raffleService } from '@/services/raffleService'
 import { RaffleNumberList } from './RaffleNumberList'
 import { RaffleNumberListPagination } from './RaffleNumberListPagination'
 import { RaffleNumberLegend } from './RaffleNumberLegend'
+import { RaffleSaleModal } from './RaffleSaleModal'
 
 interface RaffleNumberListContainerProps {
   raffleId: string
@@ -28,6 +29,7 @@ export function RaffleNumberListContainer({
   const [totalPages, setTotalPages] = useState(0)
   const [currentPageSize, setCurrentPageSize] = useState(pageSize)
   const [raffleInfo, setRaffleInfo] = useState<RaffleResponse | null>(null)
+  const [isSaleModalOpen, setIsSaleModalOpen] = useState(false)
 
   const loadRaffleInfo = async () => {
     try {
@@ -96,6 +98,11 @@ export function RaffleNumberListContainer({
     // Não logar mensagens de usuário como erros
   }
 
+  const handleSaleSuccess = () => {
+    // Recarregar os dados após venda bem-sucedida
+    loadNumbers(currentPage, currentPageSize)
+  }
+
   // Carregar informações da rifa quando o componente monta ou raffleId muda
   useEffect(() => {
     if (raffleId) {
@@ -123,21 +130,32 @@ export function RaffleNumberListContainer({
           )}
         </div>
         
-        <button
-          onClick={handleRefresh}
-          disabled={isLoading}
-          className="inline-flex items-center px-2 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <svg 
-            className={`w-3 h-3 mr-1 ${isLoading ? 'animate-spin' : ''}`} 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setIsSaleModalOpen(true)}
+            className="inline-flex items-center px-3 py-1 border border-green-300 shadow-sm text-xs font-medium rounded text-green-700 bg-green-50 hover:bg-green-100 focus:outline-none focus:ring-1 focus:ring-green-500"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-          Atualizar
-        </button>
+            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+            </svg>
+            Vender
+          </button>
+          <button
+            onClick={handleRefresh}
+            disabled={isLoading}
+            className="inline-flex items-center px-2 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg 
+              className={`w-3 h-3 mr-1 ${isLoading ? 'animate-spin' : ''}`} 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Atualizar
+          </button>
+        </div>
       </div>
 
       {/* Legenda */}
@@ -165,6 +183,16 @@ export function RaffleNumberListContainer({
           onItemsPerPageChange={handleItemsPerPageChange}
           onPageChange={handlePageChange}
           isLoading={isLoading}
+        />
+      )}
+
+      {/* Modal de venda */}
+      {raffleInfo && (
+        <RaffleSaleModal
+          isOpen={isSaleModalOpen}
+          onClose={() => setIsSaleModalOpen(false)}
+          raffle={raffleInfo}
+          onSaleSuccess={handleSaleSuccess}
         />
       )}
     </div>
