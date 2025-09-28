@@ -261,8 +261,6 @@ export function RaffleSaleModal({
               </div>
             </div>
           )}
-        </div>
-
           </div>
 
           {/* Footer */}
