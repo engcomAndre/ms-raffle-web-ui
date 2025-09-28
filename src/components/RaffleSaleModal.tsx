@@ -144,36 +144,47 @@ export function RaffleSaleModal({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-medium text-gray-900">
-            Vender Números Reservados
-          </h3>
-          <button
-            onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      {/* Overlay */}
+      <div 
+        className="fixed inset-0 bg-transparent backdrop-blur-sm transition-opacity"
+        onClick={handleClose}
+        data-testid="overlay"
+      />
+      
+      {/* Modal */}
+      <div className="flex min-h-full items-center justify-center p-4">
+        <div className="relative w-full max-w-4xl bg-white rounded-lg shadow-xl">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Vender Números Reservados
+            </h3>
+            <button
+              onClick={handleClose}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
 
-        {/* Informações da rifa */}
-        <div className="mb-4 p-3 bg-gray-50 rounded-md">
-          <h4 className="font-medium text-gray-900">{raffle.title}</h4>
-          <p className="text-sm text-gray-600">
-            {raffle.description && raffle.description.length > 100 
-              ? `${raffle.description.substring(0, 100)}...` 
-              : raffle.description
-            }
-          </p>
-        </div>
+          {/* Informações da rifa */}
+          <div className="p-6 border-b border-gray-200">
+            <div className="p-4 bg-gray-50 rounded-md">
+              <h4 className="font-medium text-gray-900">{raffle.title}</h4>
+              <p className="text-sm text-gray-600 mt-1">
+                {raffle.description && raffle.description.length > 100 
+                  ? `${raffle.description.substring(0, 100)}...` 
+                  : raffle.description
+                }
+              </p>
+            </div>
+          </div>
 
-        {/* Conteúdo */}
-        <div className="mb-6">
+          {/* Conteúdo */}
+          <div className="p-6">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
@@ -252,22 +263,24 @@ export function RaffleSaleModal({
           )}
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end space-x-3">
-          <button
-            onClick={handleClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handleConfirmSale}
-            disabled={selectedNumbers.size === 0 || isSelling}
-            className="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSelling ? 'Vendendo...' : `Confirmar Venda (${selectedNumbers.size})`}
-          </button>
-        </div>
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-end space-x-3 p-6 border-t border-gray-200 bg-gray-50 rounded-b-lg">
+            <button
+              onClick={handleClose}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleConfirmSale}
+              disabled={selectedNumbers.size === 0 || isSelling}
+              className="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {isSelling ? 'Vendendo...' : `Confirmar Venda (${selectedNumbers.size})`}
+            </button>
+          </div>
 
         {/* Toast */}
         {toast && (
@@ -277,7 +290,9 @@ export function RaffleSaleModal({
             onClose={() => setToast(null)}
           />
         )}
+        </div>
       </div>
     </div>
   )
 }
+
