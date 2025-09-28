@@ -32,6 +32,23 @@ export function RaffleSaleModal({
     }
   }, [isOpen, raffle.id])
 
+  // Fechar modal com ESC
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        handleClose()
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown)
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isOpen])
+
   const loadReservedNumbers = async () => {
     try {
       setIsLoading(true)
@@ -144,47 +161,38 @@ export function RaffleSaleModal({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Overlay */}
-      <div 
-        className="fixed inset-0 bg-transparent backdrop-blur-sm transition-opacity"
-        onClick={handleClose}
-        data-testid="overlay"
-      />
-      
-      {/* Modal */}
-      <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative w-full max-w-4xl bg-white rounded-lg shadow-xl">
-          {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Vender Números Reservados
-            </h3>
-            <button
-              onClick={handleClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+    <div className="fixed inset-0 bg-transparent backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">
+            Vender Números Reservados
+          </h3>
+          <button
+            onClick={handleClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
-          {/* Informações da rifa */}
-          <div className="p-6 border-b border-gray-200">
-            <div className="p-4 bg-gray-50 rounded-md">
-              <h4 className="font-medium text-gray-900">{raffle.title}</h4>
-              <p className="text-sm text-gray-600 mt-1">
-                {raffle.description && raffle.description.length > 100 
-                  ? `${raffle.description.substring(0, 100)}...` 
-                  : raffle.description
-                }
-              </p>
-            </div>
+        {/* Informações da rifa */}
+        <div className="p-6 border-b border-gray-200">
+          <div className="p-4 bg-gray-50 rounded-md">
+            <h4 className="font-medium text-gray-900">{raffle.title}</h4>
+            <p className="text-sm text-gray-600 mt-1">
+              {raffle.description && raffle.description.length > 100 
+                ? `${raffle.description.substring(0, 100)}...` 
+                : raffle.description
+              }
+            </p>
           </div>
+        </div>
 
-          {/* Conteúdo */}
-          <div className="p-6">
+        {/* Conteúdo */}
+        <div className="p-6">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
@@ -261,34 +269,33 @@ export function RaffleSaleModal({
               </div>
             </div>
           )}
-          </div>
-
-          {/* Footer */}
-          <div className="flex items-center justify-end space-x-3 p-6 border-t border-gray-200 bg-gray-50 rounded-b-lg">
-            <button
-              onClick={handleClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleConfirmSale}
-              disabled={selectedNumbers.size === 0 || isSelling}
-              className="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isSelling ? 'Vendendo...' : `Confirmar Venda (${selectedNumbers.size})`}
-            </button>
-          </div>
-
-          {/* Toast */}
-          {toast && (
-            <Toast
-              message={toast.message}
-              type={toast.type}
-              onClose={() => setToast(null)}
-            />
-          )}
         </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-end space-x-3 p-6 border-t border-gray-200 bg-gray-50 rounded-b-lg">
+          <button
+            onClick={handleClose}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={handleConfirmSale}
+            disabled={selectedNumbers.size === 0 || isSelling}
+            className="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {isSelling ? 'Vendendo...' : `Confirmar Venda (${selectedNumbers.size})`}
+          </button>
+        </div>
+
+        {/* Toast */}
+        {toast && (
+          <Toast
+            message={toast.message}
+            type={toast.type}
+            onClose={() => setToast(null)}
+          />
+        )}
       </div>
     </div>
   )

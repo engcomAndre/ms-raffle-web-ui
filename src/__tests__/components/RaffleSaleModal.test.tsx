@@ -350,7 +350,7 @@ describe('RaffleSaleModal', () => {
     })
   })
 
-  it('should close modal when clicking overlay', async () => {
+  it('should close modal when pressing Escape key', async () => {
     render(
       <RaffleSaleModal
         isOpen={true}
@@ -360,8 +360,8 @@ describe('RaffleSaleModal', () => {
       />
     )
 
-    const overlay = screen.getByTestId('overlay')
-    fireEvent.click(overlay)
+    // Simular tecla Escape
+    fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' })
 
     expect(mockOnClose).toHaveBeenCalled()
   })
