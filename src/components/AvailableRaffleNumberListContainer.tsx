@@ -115,14 +115,15 @@ export function AvailableRaffleNumberListContainer({
       </div>
 
       {/* Paginação */}
-      {showPagination && totalPages > 1 && (
+      {showPagination && totalElements > 0 && (
         <RaffleNumberListPagination
           currentPage={currentPage}
           totalPages={totalPages}
-          totalElements={totalElements}
-          pageSize={currentPageSize}
+          totalNumbers={totalElements}
+          itemsPerPage={currentPageSize}
           onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
+          onItemsPerPageChange={handlePageSizeChange}
+          isLoading={isLoading}
         />
       )}
 
