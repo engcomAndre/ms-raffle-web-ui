@@ -197,9 +197,9 @@ export class RaffleService {
    */
   async incrementRaffleNumbers(raffleId: string, incrementsBy: number): Promise<ApiResponse<void>> {
     console.log(`➕ [RAFFLE] Incrementando ${incrementsBy} números na rifa ID: ${raffleId}`)
-
-    const response = await this.raffleApiService.post<void>(`/v1/raffles/${raffleId}/numbers/increment?incrementsBy=${incrementsBy}`)
-
+    
+    const response = await this.raffleApiService.patch<void>(`/v1/raffles/${raffleId}/increment?incrementsBy=${incrementsBy}`)
+    
     console.log('📊 [RAFFLE] Resposta do incremento:', response)
 
     if (!response.success) {
