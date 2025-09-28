@@ -134,6 +134,12 @@ export const AvailableRaffleList = forwardRef<AvailableRaffleListRef, AvailableR
   useEffect(() => {
     if (onDataChange) {
       const totalPages = Math.ceil(filteredRaffles.length / pageSize)
+      console.log('📊 [AVAILABLE-RAFFLE-LIST] Calculando paginação:', {
+        filteredRafflesLength: filteredRaffles.length,
+        pageSize,
+        totalPages,
+        currentPage
+      })
       onDataChange(filteredRaffles.length, totalPages)
     }
   }, [filteredRaffles.length, pageSize, onDataChange])
