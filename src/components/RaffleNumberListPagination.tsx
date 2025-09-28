@@ -62,10 +62,7 @@ export function RaffleNumberListPagination({
       <div className="flex items-center space-x-2">
         {/* Botão página anterior */}
         <button
-          onClick={() => {
-            console.log('🔄 [PAGINATION] Clicou em página anterior, página atual:', currentPage)
-            onPageChange(currentPage - 1)
-          }}
+          onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 0 || isLoading}
           className="flex items-center justify-center w-8 h-8 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border border-blue-200"
           title="Página anterior"
@@ -82,10 +79,7 @@ export function RaffleNumberListPagination({
 
         {/* Botão próxima página */}
         <button
-          onClick={() => {
-            console.log('🔄 [PAGINATION] Clicou em próxima página, página atual:', currentPage)
-            onPageChange(currentPage + 1)
-          }}
+          onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages - 1 || isLoading}
           className="flex items-center justify-center w-8 h-8 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border border-blue-200"
           title="Próxima página"

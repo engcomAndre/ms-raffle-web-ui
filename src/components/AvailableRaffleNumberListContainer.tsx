@@ -72,13 +72,11 @@ export function AvailableRaffleNumberListContainer({
   }
 
   const handlePageChange = (page: number) => {
-    console.log('🔄 [PAGINATION] Mudando para página:', page)
     setCurrentPage(page)
     loadNumbers(page, currentPageSize)
   }
 
   const handlePageSizeChange = (size: number) => {
-    console.log('🔄 [PAGINATION] Mudando tamanho da página para:', size)
     setCurrentPageSize(size)
     setCurrentPage(0)
     loadNumbers(0, size)
@@ -98,17 +96,6 @@ export function AvailableRaffleNumberListContainer({
   useEffect(() => {
     loadNumbers()
   }, [raffleId])
-
-  // Debug: mostrar estado da paginação
-  useEffect(() => {
-    console.log('📊 [PAGINATION] Estado atual:', {
-      currentPage,
-      totalPages,
-      totalElements,
-      currentPageSize,
-      numbersCount: numbers.length
-    })
-  }, [currentPage, totalPages, totalElements, currentPageSize, numbers.length])
 
   return (
     <div className="space-y-4">
