@@ -23,9 +23,9 @@ export class TokenValidationService {
       console.log('🔄 [TOKEN-VALIDATION] BREAKPOINT 6: Validando JWT localmente...')
       
       // Validar JWT localmente (sem fazer requisição)
-      const isValid = this.validateJWTLocally(token)
+      const validationResult = this.validateJWTLocally(token)
       
-      if (isValid) {
+      if (validationResult.valid) {
         // Decodificar JWT para extrair informações do usuário
         const userData = this.decodeJWT(token)
         console.log('✅ [TOKEN-VALIDATION] Token válido, usuário:', userData)
@@ -40,10 +40,10 @@ export class TokenValidationService {
           }
         }
       } else {
-        console.log('❌ [TOKEN-VALIDATION] Token inválido ou expirado')
+        console.log('❌ [TOKEN-VALIDATION] Token inválido:', validationResult.error)
         return {
           valid: false,
-          error: 'Token inválido ou expirado'
+          error: validationResult.error || 'Token inválido ou expirado'
         }
       }
     } catch (error) {
@@ -55,31 +55,41 @@ export class TokenValidationService {
     }
   }
 
-  private validateJWTLocally(token: string): boolean {
+  private validateJWTLocally(token: string): { valid: boolean; error?: string } {
     try {
+      // Verificar se o token não está vazio
+      if (!token || token.trim() === '') {
+        return { valid: false, error: 'Token inválido' }
+      }
+
+      // Verificar se é um JWT válido (deve ter 3 partes separadas por ponto)
+      if (!token.includes('.') || token.split('.').length !== 3) {
+        return { valid: false, error: 'Token inválido' }
+      }
+
       // Decodificar JWT
       const payload = this.decodeJWT(token)
       
-      if (!payload) return false
+      if (!payload) return { valid: false, error: 'Token inválido' }
       
       // Verificar se não expirou
       const currentTime = Math.floor(Date.now() / 1000)
       if (payload.exp && payload.exp < currentTime) {
         console.log('❌ [TOKEN-VALIDATION] Token expirado')
-        return false
+        return { valid: false, error: 'Token expirado' }
       }
       
       // Verificar se tem campos obrigatórios
       if (!payload.sub || !payload.preferred_username) {
         console.log('❌ [TOKEN-VALIDATION] Token sem campos obrigatórios')
-        return false
+        return { valid: false, error: 'Token inválido' }
       }
       
       console.log('✅ [TOKEN-VALIDATION] JWT válido localmente')
-      return true
+      return { valid: true }
     } catch (error) {
       console.error('❌ [TOKEN-VALIDATION] Erro ao validar JWT:', error)
-      return false
+      return { valid: false, error: 'Token inválido' }
     }
   }
 
@@ -168,7 +178,7 @@ export class TokenValidationService {
     }
   }
 
-  private redirectToRoute(route: string): void {
+  public redirectToRoute(route: string): void {
     try {
       console.log('🚀 [TOKEN-VALIDATION] Redirecionando para:', route)
       
@@ -177,14 +187,20 @@ export class TokenValidationService {
       console.log('🔄 [TOKEN-VALIDATION] BREAKPOINT 5: Executando window.location.href...')
       
       // Usar window.location.href para redirecionamento direto
-      window.location.href = route
-      console.log('✅ [TOKEN-VALIDATION] Redirecionamento executado')
+      if (typeof window !== 'undefined' && window.location) {
+        window.location.href = route
+        console.log('✅ [TOKEN-VALIDATION] Redirecionamento executado')
+      } else {
+        console.warn('⚠️ [TOKEN-VALIDATION] window.location não disponível')
+      }
     } catch (error) {
       console.error('❌ [TOKEN-VALIDATION] Erro no redirecionamento:', error)
       
       // Fallback: tentar recarregar a página
       try {
-        window.location.reload()
+        if (typeof window !== 'undefined' && window.location) {
+          window.location.reload()
+        }
       } catch (fallbackError) {
         console.error('💥 [TOKEN-VALIDATION] Erro no fallback:', fallbackError)
       }

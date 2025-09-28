@@ -27,6 +27,10 @@ export class GoogleLoginService {
     try {
       console.log('🚪 [GOOGLE-LOGIN] Executando logout...')
       
+      // Usar Zustand para gerenciar estado global
+      const authStore = useAuthStore.getState()
+      authStore.logout()
+      
       // Limpar dados do localStorage
       const authKeys = [
         'auth-token',
@@ -49,6 +53,30 @@ export class GoogleLoginService {
       console.log('✅ [GOOGLE-LOGIN] Logout realizado com sucesso')
     } catch (error) {
       console.error('❌ [GOOGLE-LOGIN] Erro durante logout:', error)
+    }
+  }
+
+  // Método para login (que estava faltando)
+  async login(userData: GoogleUserData): Promise<{ success: boolean; data?: GoogleUserData; error?: string }> {
+    try {
+      console.log('🔐 [GOOGLE-LOGIN] Iniciando login com Google')
+      console.log('📝 [GOOGLE-LOGIN] Dados do usuário:', userData)
+
+      // Usar Zustand para gerenciar estado global
+      const authStore = useAuthStore.getState()
+      
+      // Gerar token simulado
+      const simulatedToken = 'google_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+      
+      // Atualizar store global
+      authStore.loginGoogle(userData, simulatedToken)
+      
+      console.log('✅ [GOOGLE-LOGIN] Estado global atualizado via Zustand')
+      
+      return { success: true, data: userData }
+    } catch (error) {
+      console.error('💥 [GOOGLE-LOGIN] Erro durante o login:', error)
+      return { success: false, error: 'Erro interno durante o login com Google' }
     }
   }
 

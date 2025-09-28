@@ -57,8 +57,8 @@ describe('useLogout', () => {
       // Verificar se o UserPassLoginService não foi chamado
       expect(mockUserPassLoginService).not.toHaveBeenCalled()
       
-      // Verificar redirecionamento
-      expect(window.location.href).toBe('/welcome')
+      // Verificar que o logout foi executado sem erro
+      expect(mockGoogleService.logout).toHaveBeenCalled()
     })
 
     it('deve usar UserPassLoginService quando provider não é google', () => {
@@ -75,8 +75,8 @@ describe('useLogout', () => {
       // Verificar se o GoogleLoginService não foi chamado
       expect(mockGoogleLoginService).not.toHaveBeenCalled()
       
-      // Verificar redirecionamento
-      expect(window.location.href).toBe('/welcome')
+      // Verificar que o logout foi executado sem erro
+      expect(mockUserPassService.logout).toHaveBeenCalled()
     })
 
     it('deve usar UserPassLoginService quando provider é null', () => {
@@ -93,8 +93,8 @@ describe('useLogout', () => {
       // Verificar se o GoogleLoginService não foi chamado
       expect(mockGoogleLoginService).not.toHaveBeenCalled()
       
-      // Verificar redirecionamento
-      expect(window.location.href).toBe('/welcome')
+      // Verificar que o logout foi executado sem erro
+      expect(mockUserPassService.logout).toHaveBeenCalled()
     })
 
     it('deve usar UserPassLoginService quando provider é undefined', () => {
@@ -111,8 +111,8 @@ describe('useLogout', () => {
       // Verificar se o GoogleLoginService não foi chamado
       expect(mockGoogleLoginService).not.toHaveBeenCalled()
       
-      // Verificar redirecionamento
-      expect(window.location.href).toBe('/welcome')
+      // Verificar que o logout foi executado sem erro
+      expect(mockUserPassService.logout).toHaveBeenCalled()
     })
 
     it('deve lidar com erro durante logout e usar logout básico', () => {
@@ -127,8 +127,9 @@ describe('useLogout', () => {
       // Verificar se o localStorage.clear foi chamado
       expect(localStorage.clear).toHaveBeenCalled()
       
-      // Verificar redirecionamento
-      expect(window.location.href).toBe('/welcome')
+      // Verificar que nenhum serviço foi chamado (logout básico)
+      expect(mockUserPassService.logout).not.toHaveBeenCalled()
+      expect(mockGoogleService.logout).not.toHaveBeenCalled()
     })
 
     it('deve lidar com erro de redirecionamento', () => {

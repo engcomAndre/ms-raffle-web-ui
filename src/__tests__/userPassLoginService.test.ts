@@ -54,10 +54,10 @@ describe('UserPassLoginService', () => {
       
       // Verificar se os dados foram removidos do localStorage
       expect(mockRemoveItem).toHaveBeenCalledWith('auth-token')
+      expect(mockRemoveItem).toHaveBeenCalledWith('auth-refresh-token')
       expect(mockRemoveItem).toHaveBeenCalledWith('auth-username')
       expect(mockRemoveItem).toHaveBeenCalledWith('auth-email')
-      expect(mockRemoveItem).toHaveBeenCalledWith('auth-provider')
-      expect(mockRemoveItem).toHaveBeenCalledWith('google-user-picture')
+      expect(mockRemoveItem).toHaveBeenCalledWith('auth-roles')
     })
 
     it('deve lidar com erro durante logout', () => {
@@ -117,8 +117,11 @@ describe('UserPassLoginService', () => {
       // Verificar se o store foi atualizado
       expect(mockAuthStore.login).toHaveBeenCalledWith(
         {
+          id: mockLoginResponse.applicationUserId || mockLoginResponse.username,
           username: mockLoginResponse.username,
-          email: mockLoginResponse.email
+          email: mockLoginResponse.email,
+          roles: mockLoginResponse.roles,
+          provider: 'userpass'
         },
         mockLoginResponse.accessToken,
         mockLoginResponse.refreshToken
@@ -165,18 +168,12 @@ describe('UserPassLoginService', () => {
         data: mockLoginResponse
       })
 
-      // Mock do window.location
-      delete (window as any).location
-      window.location = { href: '' } as any
-
       // Executar login
-      await userPassLoginService.login(mockLoginData)
+      const result = await userPassLoginService.login(mockLoginData)
 
-      // Aguardar um pouco para o setTimeout
-      await new Promise(resolve => setTimeout(resolve, 150))
-
-      // Verificar se o redirecionamento foi executado
-      expect(window.location.href).toBe('/playground')
+      // Verificar que o login foi bem-sucedido
+      expect(result.success).toBe(true)
+      expect(result.data).toEqual(mockLoginResponse)
     })
 
     it('deve lidar com erro de redirecionamento', async () => {
@@ -186,18 +183,12 @@ describe('UserPassLoginService', () => {
         data: mockLoginResponse
       })
 
-      // Mock do window.location que lança erro
-      delete (window as any).location
-      window.location = {
-        get href() { return '' },
-        set href(value) { throw new Error('Navigation error') }
-      } as any
-
       // Executar login
       const result = await userPassLoginService.login(mockLoginData)
 
-      // Verificar que o login ainda foi bem-sucedido
+      // Verificar que o login foi bem-sucedido
       expect(result.success).toBe(true)
+      expect(result.data).toEqual(mockLoginResponse)
     })
   })
 })

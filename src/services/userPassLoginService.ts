@@ -30,6 +30,10 @@ export class UserPassLoginService {
     try {
       console.log('🚪 [USERPASS-LOGIN] Executando logout...')
       
+      // Usar Zustand para gerenciar estado global
+      const authStore = useAuthStore.getState()
+      authStore.logout()
+      
       // Limpar dados do localStorage
       const authKeys = [
         'auth-token',

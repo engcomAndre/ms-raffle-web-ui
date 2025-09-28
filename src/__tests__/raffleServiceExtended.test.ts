@@ -92,12 +92,8 @@ describe('RaffleService - Extended Tests', () => {
       // Mock de exceção
       mockApiServiceInstance.post.mockRejectedValue(new Error('Network error'))
 
-      // Executar criação
-      const result = await raffleService.createRaffle(mockRaffleData)
-
-      // Verificar resultado
-      expect(result.success).toBe(false)
-      expect(result.error).toBe('Network error')
+      // Executar criação e verificar que a exceção é lançada
+      await expect(raffleService.createRaffle(mockRaffleData)).rejects.toThrow('Network error')
     })
   })
 
@@ -287,15 +283,11 @@ describe('RaffleService - Extended Tests', () => {
       // Mock de erro da API
       mockApiServiceInstance.post.mockResolvedValue({
         success: false,
-        error: 'Number already reserved'
+        message: 'Number already reserved'
       })
 
-      // Executar reserva
-      const result = await raffleService.reserveRaffleNumber(mockRaffleId, mockNumber)
-
-      // Verificar resultado
-      expect(result.success).toBe(false)
-      expect(result.error).toBe('Number already reserved')
+      // Executar reserva e verificar que a exceção é lançada
+      await expect(raffleService.reserveRaffleNumber(mockRaffleId, mockNumber)).rejects.toThrow('Number already reserved')
     })
   })
 
@@ -327,15 +319,11 @@ describe('RaffleService - Extended Tests', () => {
       // Mock de erro da API
       mockApiServiceInstance.post.mockResolvedValue({
         success: false,
-        error: 'Number not reserved'
+        message: 'Number not reserved'
       })
 
-      // Executar desreserva
-      const result = await raffleService.unreserveRaffleNumber(mockRaffleId, mockNumber)
-
-      // Verificar resultado
-      expect(result.success).toBe(false)
-      expect(result.error).toBe('Number not reserved')
+      // Executar desreserva e verificar que a exceção é lançada
+      await expect(raffleService.unreserveRaffleNumber(mockRaffleId, mockNumber)).rejects.toThrow('Number not reserved')
     })
   })
 

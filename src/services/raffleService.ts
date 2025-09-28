@@ -139,7 +139,7 @@ export class RaffleService {
   async reserveRaffleNumber(raffleId: string, number: number): Promise<ApiResponse<void>> {
     console.log(`🔒 [RAFFLE] Reservando número ${number} da rifa ID: ${raffleId}`)
     
-    const response = await this.raffleApiService.post<void>(`/v1/raffles/${raffleId}/numbers/reserve`, { number })
+    const response = await this.raffleApiService.post<void>(`/v1/raffles/${raffleId}/numbers/reserve`, { number: number.toString() })
     
     console.log('📊 [RAFFLE] Resposta da reserva:', response)
     
@@ -179,7 +179,7 @@ export class RaffleService {
   async unreserveRaffleNumber(raffleId: string, number: number): Promise<ApiResponse<void>> {
     console.log(`♻️ [RAFFLE] Desreservando número ${number} da rifa ID: ${raffleId}`)
 
-    const response = await this.raffleApiService.post<void>(`/v1/raffles/${raffleId}/numbers/unreserve`, { number })
+    const response = await this.raffleApiService.post<void>(`/v1/raffles/${raffleId}/numbers/unreserve`, { number: number.toString() })
 
     console.log('📊 [RAFFLE] Resposta da desreserva:', response)
 
