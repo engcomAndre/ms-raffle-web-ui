@@ -29,18 +29,6 @@ export function AvailableRaffleNumberListContainer({
   const [totalElements, setTotalElements] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
   const [currentPageSize, setCurrentPageSize] = useState(pageSize)
-  const [raffleInfo, setRaffleInfo] = useState<RaffleResponse | null>(null)
-
-  const loadRaffleInfo = async () => {
-    try {
-      const response = await raffleService.getRaffleById(raffleId)
-      if (response.success && response.data) {
-        setRaffleInfo(response.data)
-      }
-    } catch (error) {
-      console.error('Erro ao carregar informações da rifa:', error)
-    }
-  }
 
   const loadNumbers = async (page: number = 0, size: number = currentPageSize) => {
     try {
@@ -106,32 +94,11 @@ export function AvailableRaffleNumberListContainer({
 
   // Carregar dados iniciais
   useEffect(() => {
-    loadRaffleInfo()
     loadNumbers()
   }, [raffleId])
 
   return (
     <div className="space-y-4">
-      {/* Informações da rifa */}
-      {raffleInfo && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-blue-900">{raffleInfo.title}</h3>
-              <p className="text-sm text-blue-700">{raffleInfo.description}</p>
-            </div>
-            <div className="text-right">
-              <div className="text-sm text-blue-600">
-                <span className="font-medium">{totalElements}</span> números disponíveis
-              </div>
-              <div className="text-xs text-blue-500">
-                de {raffleInfo.maxNumbers || 'N/A'} máximo
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Legenda */}
       <RaffleNumberLegend />
 
@@ -140,7 +107,6 @@ export function AvailableRaffleNumberListContainer({
         <AvailableRaffleNumberList
           numbers={numbers}
           raffleId={raffleId}
-          raffleInfo={raffleInfo}
           isLoading={isLoading}
           error={error}
           onReserveSuccess={() => loadNumbers(currentPage, currentPageSize)}

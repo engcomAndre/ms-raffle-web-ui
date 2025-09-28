@@ -8,7 +8,6 @@ import { Toast } from './Toast'
 interface AvailableRaffleNumberListProps {
   numbers: RaffleNumberItemResponse[]
   raffleId: string
-  raffleInfo?: RaffleResponse | null
   isLoading?: boolean
   error?: string | null
   emptyMessage?: string
@@ -19,7 +18,6 @@ interface AvailableRaffleNumberListProps {
 export function AvailableRaffleNumberList({ 
   numbers, 
   raffleId,
-  raffleInfo,
   isLoading = false, 
   error = null, 
   emptyMessage = 'Nenhum número encontrado para esta rifa.',
@@ -89,7 +87,6 @@ export function AvailableRaffleNumberList({
             key={numberItem.number}
             numberItem={numberItem}
             raffleId={raffleId}
-            raffleInfo={raffleInfo}
             onReserveSuccess={handleReserveSuccess}
             onReserveError={handleReserveError}
           />
