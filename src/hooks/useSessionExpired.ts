@@ -14,6 +14,7 @@ export function useSessionExpired(): UseSessionExpiredReturn {
   const [showSessionExpiredModal, setShowSessionExpiredModal] = useState(false)
 
   const handleSessionExpired = useCallback(() => {
+    console.log('🔐 [SESSION] Session expired detected - showing modal')
     setIsSessionExpired(true)
     setShowSessionExpiredModal(true)
     
@@ -66,7 +67,18 @@ export function useSessionExpired(): UseSessionExpiredReturn {
         
         return response
       } catch (error) {
-        // If fetch fails completely, don't handle as session expired
+        // Check if it's a CORS error or network error that might indicate session expired
+        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+          // This could be a CORS error due to expired token
+          // Check if we have a token in localStorage
+          const token = localStorage.getItem('auth-token')
+          if (token) {
+            // If we have a token but getting CORS errors, likely session expired
+            console.log('🔐 [SESSION] CORS error with token present - likely session expired')
+            handleSessionExpired()
+          }
+        }
+        // If fetch fails completely, re-throw the error
         throw error
       }
     }

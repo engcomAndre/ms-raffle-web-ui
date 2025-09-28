@@ -12,9 +12,12 @@ export default function SessionExpiredModal({ isOpen, onClose }: SessionExpiredM
   const [countdown, setCountdown] = useState(3)
   const router = useRouter()
 
+  console.log('🔐 [SESSION-MODAL] isOpen:', isOpen)
+
   useEffect(() => {
     if (!isOpen) return
 
+    console.log('🔐 [SESSION-MODAL] Modal opened - starting countdown')
     // Reset countdown when modal opens
     setCountdown(3)
 
