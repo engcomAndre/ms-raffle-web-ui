@@ -32,7 +32,7 @@ export default function DashboardPage() {
         const activeRaffles = raffles.filter(raffle => {
           const startDate = new Date(raffle.startAt)
           const endDate = new Date(raffle.endAt)
-          return startDate <= now && now <= endDate && raffle.isActive
+          return startDate <= now && now <= endDate && raffle.active
         }).length
         
         // Calcular receita total (simplificado - assumindo preço fixo por número)

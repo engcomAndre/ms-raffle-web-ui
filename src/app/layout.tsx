@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { GoogleScript } from "@/components/GoogleScript";
+import SessionProvider from "@/components/SessionProvider";
 
 export const metadata: Metadata = {
   title: "MS Raffle - Sistema de Gerenciamento de Rifas",
@@ -30,7 +31,9 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <GoogleScript />
-        {children}
+        <SessionProvider>
+          {children}
+        </SessionProvider>
       </body>
     </html>
   );

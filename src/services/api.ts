@@ -135,6 +135,21 @@ export class ApiService {
 
       if (!response.ok) {
         console.log(`❌ [API] Erro na resposta: ${response.status}`)
+        
+        // Check for token expiration (401 Unauthorized)
+        if (response.status === 401) {
+          console.log(`🔐 [API] Token expirado ou inválido - Status 401`)
+          // Clear auth data
+          useAuthStore.getState().logout()
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('auth-token')
+            localStorage.removeItem('auth-username')
+            localStorage.removeItem('auth-email')
+            localStorage.removeItem('auth-provider')
+            localStorage.removeItem('google-user-picture')
+          }
+        }
+        
         return {
           success: false,
           error: `HTTP error! status: ${response.status}`,

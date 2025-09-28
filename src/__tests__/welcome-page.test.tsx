@@ -21,3 +21,4 @@ describe('Welcome Page', () => {
     expect(container.firstChild).toBeInTheDocument()
   })
 })
+
