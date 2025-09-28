@@ -22,8 +22,8 @@ export default function SessionExpiredModal({ isOpen, onClose }: SessionExpiredM
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer)
-          // Redirect to login page
-          router.push('/login')
+          // Redirect to welcome page
+          router.push('/welcome')
           onClose?.()
           return 0
         }
@@ -74,7 +74,7 @@ export default function SessionExpiredModal({ isOpen, onClose }: SessionExpiredM
               {countdown}
             </div>
             <div className="text-sm text-gray-600">
-              Redirecionando para o login em {countdown} segundo{countdown !== 1 ? 's' : ''}...
+              Redirecionando para o welcome em {countdown} segundo{countdown !== 1 ? 's' : ''}...
             </div>
           </div>
 
@@ -89,12 +89,12 @@ export default function SessionExpiredModal({ isOpen, onClose }: SessionExpiredM
           {/* Manual redirect button */}
           <button
             onClick={() => {
-              router.push('/login')
+              router.push('/welcome')
               onClose?.()
             }}
             className="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors duration-200"
           >
-            Ir para Login Agora
+            Ir para Welcome Agora
           </button>
         </div>
       </div>

@@ -35,8 +35,8 @@ describe('SessionExpiredModal', () => {
     expect(screen.getByText('Sessão Expirada')).toBeInTheDocument()
     expect(screen.getByText('Sua sessão expirou. Por favor, faça login novamente.')).toBeInTheDocument()
     expect(screen.getByText('3')).toBeInTheDocument()
-    expect(screen.getByText('Redirecionando para o login em 3 segundos...')).toBeInTheDocument()
-    expect(screen.getByText('Ir para Login Agora')).toBeInTheDocument()
+    expect(screen.getByText('Redirecionando para o welcome em 3 segundos...')).toBeInTheDocument()
+    expect(screen.getByText('Ir para Welcome Agora')).toBeInTheDocument()
   })
 
   it('should countdown from 3 to 0 and redirect', async () => {
@@ -44,26 +44,26 @@ describe('SessionExpiredModal', () => {
     
     // Initial state
     expect(screen.getByText('3')).toBeInTheDocument()
-    expect(screen.getByText('Redirecionando para o login em 3 segundos...')).toBeInTheDocument()
+    expect(screen.getByText('Redirecionando para o welcome em 3 segundos...')).toBeInTheDocument()
     
     // After 1 second
     jest.advanceTimersByTime(1000)
     await waitFor(() => {
       expect(screen.getByText('2')).toBeInTheDocument()
-      expect(screen.getByText('Redirecionando para o login em 2 segundos...')).toBeInTheDocument()
+      expect(screen.getByText('Redirecionando para o welcome em 2 segundos...')).toBeInTheDocument()
     })
     
     // After 2 seconds
     jest.advanceTimersByTime(1000)
     await waitFor(() => {
       expect(screen.getByText('1')).toBeInTheDocument()
-      expect(screen.getByText('Redirecionando para o login em 1 segundo...')).toBeInTheDocument()
+      expect(screen.getByText('Redirecionando para o welcome em 1 segundo...')).toBeInTheDocument()
     })
     
     // After 3 seconds - should redirect
     jest.advanceTimersByTime(1000)
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/login')
+      expect(mockPush).toHaveBeenCalledWith('/welcome')
     })
   })
 
@@ -79,21 +79,21 @@ describe('SessionExpiredModal', () => {
     })
   })
 
-  it('should redirect immediately when "Ir para Login Agora" is clicked', () => {
+  it('should redirect immediately when "Ir para Welcome Agora" is clicked', () => {
     render(<SessionExpiredModal isOpen={true} />)
     
-    const loginButton = screen.getByText('Ir para Login Agora')
-    loginButton.click()
+    const welcomeButton = screen.getByText('Ir para Welcome Agora')
+    welcomeButton.click()
     
-    expect(mockPush).toHaveBeenCalledWith('/login')
+    expect(mockPush).toHaveBeenCalledWith('/welcome')
   })
 
-  it('should call onClose when "Ir para Login Agora" is clicked', () => {
+  it('should call onClose when "Ir para Welcome Agora" is clicked', () => {
     const mockOnClose = jest.fn()
     render(<SessionExpiredModal isOpen={true} onClose={mockOnClose} />)
     
-    const loginButton = screen.getByText('Ir para Login Agora')
-    loginButton.click()
+    const welcomeButton = screen.getByText('Ir para Welcome Agora')
+    welcomeButton.click()
     
     expect(mockOnClose).toHaveBeenCalled()
   })
@@ -121,18 +121,18 @@ describe('SessionExpiredModal', () => {
     render(<SessionExpiredModal isOpen={true} />)
     
     // 3 seconds (plural)
-    expect(screen.getByText('Redirecionando para o login em 3 segundos...')).toBeInTheDocument()
+    expect(screen.getByText('Redirecionando para o welcome em 3 segundos...')).toBeInTheDocument()
     
     // 2 seconds (plural)
     jest.advanceTimersByTime(1000)
     await waitFor(() => {
-      expect(screen.getByText('Redirecionando para o login em 2 segundos...')).toBeInTheDocument()
+      expect(screen.getByText('Redirecionando para o welcome em 2 segundos...')).toBeInTheDocument()
     })
     
     // 1 second (singular)
     jest.advanceTimersByTime(1000)
     await waitFor(() => {
-      expect(screen.getByText('Redirecionando para o login em 1 segundo...')).toBeInTheDocument()
+      expect(screen.getByText('Redirecionando para o welcome em 1 segundo...')).toBeInTheDocument()
     })
   })
 })
