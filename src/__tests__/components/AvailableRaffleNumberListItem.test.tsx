@@ -99,8 +99,8 @@ describe('AvailableRaffleNumberListItem', () => {
       fireEvent.click(numberElement!)
 
       await waitFor(() => {
-        expect(mockUnreserve).toHaveBeenCalledWith('test-raffle-id', '123')
-        expect(mockProps.onReserveSuccess).toHaveBeenCalledWith('123')
+        expect(mockUnreserve).toHaveBeenCalledWith('test-raffle-id', 123)
+        expect(mockProps.onReserveSuccess).toHaveBeenCalledWith(123)
       })
     })
 
@@ -120,7 +120,7 @@ describe('AvailableRaffleNumberListItem', () => {
       fireEvent.click(numberElement!)
 
       await waitFor(() => {
-        expect(mockUnreserve).toHaveBeenCalledWith('test-raffle-id', '123')
+        expect(mockUnreserve).toHaveBeenCalledWith('test-raffle-id', 123)
         expect(mockProps.onReserveError).toHaveBeenCalledWith('Erro desconhecido')
       })
     })

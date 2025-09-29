@@ -46,22 +46,33 @@ export function AvailableRaffleNumberListItem({
   
   const canReserve = localStatus === 'ACTIVE' && !isReserving
   const currentUser = localStorage.getItem('auth-username')
-  const canUnreserve = localStatus === 'RESERVED' && !isReserving && numberItem.reservedBy === currentUser
+  const reservedByTrimmed = numberItem.reservedBy?.trim()
+  const currentUserTrimmed = currentUser?.trim()
+  const canUnreserve = localStatus === 'RESERVED' && !isReserving && reservedByTrimmed === currentUserTrimmed
   
   // Debug log para verificar comparação
-  console.log(`🔍 [UNRESERVE-DEBUG] Number: ${numberItem.number}, Status: ${localStatus}, ReservedBy: ${numberItem.reservedBy}, CurrentUser: ${currentUser}, CanUnreserve: ${canUnreserve}`)
+  console.log(`🔍 [UNRESERVE-DEBUG] Number: ${numberItem.number}, Status: ${localStatus}`)
+  console.log(`🔍 [UNRESERVE-DEBUG] ReservedBy: "${numberItem.reservedBy}" (length: ${numberItem.reservedBy?.length})`)
+  console.log(`🔍 [UNRESERVE-DEBUG] CurrentUser: "${currentUser}" (length: ${currentUser?.length})`)
+  console.log(`🔍 [UNRESERVE-DEBUG] ReservedByTrimmed: "${reservedByTrimmed}" (length: ${reservedByTrimmed?.length})`)
+  console.log(`🔍 [UNRESERVE-DEBUG] CurrentUserTrimmed: "${currentUserTrimmed}" (length: ${currentUserTrimmed?.length})`)
+  console.log(`🔍 [UNRESERVE-DEBUG] ReservedByTrimmed === CurrentUserTrimmed: ${reservedByTrimmed === currentUserTrimmed}`)
+  console.log(`🔍 [UNRESERVE-DEBUG] CanUnreserve: ${canUnreserve}`)
 
   const handleClick = async () => {
+    console.log(`🖱️ [CLICK-DEBUG] Clicked on number ${numberItem.number}`)
+    console.log(`🖱️ [CLICK-DEBUG] CanReserve: ${canReserve}, CanUnreserve: ${canUnreserve}`)
+    console.log(`🖱️ [CLICK-DEBUG] LocalStatus: ${localStatus}, ReservedBy: ${numberItem.reservedBy}, CurrentUser: ${currentUser}`)
 
     // Toggle: reservar se ACTIVE, desreservar se RESERVED
     if (canReserve) {
       setIsReserving(true)
-      setLocalStatus('RESERVED')
+      setLocalStatus('RESERVED' as RaffleNumberStatus)
       try {
-        await raffleService.reserveRaffleNumber(raffleId, numberItem.number)
-        onReserveSuccess?.(numberItem.number)
+        await raffleService.reserveRaffleNumber(raffleId, Number(numberItem.number))
+        onReserveSuccess?.(Number(numberItem.number))
       } catch (error: unknown) {
-        setLocalStatus('ACTIVE')
+        setLocalStatus('ACTIVE' as RaffleNumberStatus)
         const errorMessage = getErrorMessage(error)
         onReserveError?.(errorMessage)
       } finally {
@@ -72,14 +83,14 @@ export function AvailableRaffleNumberListItem({
 
     if (canUnreserve) {
       setIsReserving(true)
-      setLocalStatus('ACTIVE')
+      setLocalStatus('ACTIVE' as RaffleNumberStatus)
       try {
-        await raffleService.unreserveRaffleNumber(raffleId, numberItem.number)
+        await raffleService.unreserveRaffleNumber(raffleId, Number(numberItem.number))
         console.log(`✅ [UNRESERVE] Número ${numberItem.number} desreservado com sucesso`)
         // Reutilizamos o callback de sucesso para refresh, a mensagem virá do List
-        onReserveSuccess?.(numberItem.number)
+        onReserveSuccess?.(Number(numberItem.number))
       } catch (error: unknown) {
-        setLocalStatus('RESERVED')
+        setLocalStatus('RESERVED' as RaffleNumberStatus)
         const errorMessage = getErrorMessage(error)
         console.error(`❌ [UNRESERVE] Erro ao desreservar número ${numberItem.number}:`, errorMessage)
         onReserveError?.(errorMessage)
