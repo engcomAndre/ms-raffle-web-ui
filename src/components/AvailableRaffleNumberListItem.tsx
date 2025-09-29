@@ -26,17 +26,11 @@ export function AvailableRaffleNumberListItem({
   }, [numberItem.status])
 
   const getStatusClasses = (status: RaffleNumberStatus) => {
-    const currentUser = localStorage.getItem('auth-username')
-    const isReservedByCurrentUser = status === 'RESERVED' && numberItem.reservedBy === currentUser
-    
     switch (status) {
       case 'ACTIVE':
         return 'bg-green-100 border-green-300 text-green-800 cursor-pointer hover:bg-green-200'
       case 'RESERVED':
-        if (isReservedByCurrentUser) {
-          return 'bg-orange-100 border-orange-300 text-orange-800 cursor-pointer hover:bg-orange-200'
-        }
-        return 'bg-yellow-100 border-yellow-300 text-yellow-800 cursor-not-allowed'
+        return 'bg-orange-100 border-orange-300 text-orange-800 cursor-pointer hover:bg-orange-200'
       case 'SOLD':
         return 'bg-gray-200 border-gray-400 text-gray-700 cursor-not-allowed'
       default:
@@ -45,24 +39,15 @@ export function AvailableRaffleNumberListItem({
   }
   
   const canReserve = localStatus === 'ACTIVE' && !isReserving
-  const currentUser = localStorage.getItem('auth-username')
-  const reservedByTrimmed = numberItem.reservedBy?.trim()
-  const currentUserTrimmed = currentUser?.trim()
-  const canUnreserve = localStatus === 'RESERVED' && !isReserving && reservedByTrimmed === currentUserTrimmed
+  const canUnreserve = localStatus === 'RESERVED' && !isReserving
   
-  // Debug log para verificar comparação
-  console.log(`🔍 [UNRESERVE-DEBUG] Number: ${numberItem.number}, Status: ${localStatus}`)
-  console.log(`🔍 [UNRESERVE-DEBUG] ReservedBy: "${numberItem.reservedBy}" (length: ${numberItem.reservedBy?.length})`)
-  console.log(`🔍 [UNRESERVE-DEBUG] CurrentUser: "${currentUser}" (length: ${currentUser?.length})`)
-  console.log(`🔍 [UNRESERVE-DEBUG] ReservedByTrimmed: "${reservedByTrimmed}" (length: ${reservedByTrimmed?.length})`)
-  console.log(`🔍 [UNRESERVE-DEBUG] CurrentUserTrimmed: "${currentUserTrimmed}" (length: ${currentUserTrimmed?.length})`)
-  console.log(`🔍 [UNRESERVE-DEBUG] ReservedByTrimmed === CurrentUserTrimmed: ${reservedByTrimmed === currentUserTrimmed}`)
-  console.log(`🔍 [UNRESERVE-DEBUG] CanUnreserve: ${canUnreserve}`)
+  // Debug log para verificar estado
+  console.log(`🔍 [UNRESERVE-DEBUG] Number: ${numberItem.number}, Status: ${localStatus}, CanReserve: ${canReserve}, CanUnreserve: ${canUnreserve}`)
 
   const handleClick = async () => {
     console.log(`🖱️ [CLICK-DEBUG] Clicked on number ${numberItem.number}`)
     console.log(`🖱️ [CLICK-DEBUG] CanReserve: ${canReserve}, CanUnreserve: ${canUnreserve}`)
-    console.log(`🖱️ [CLICK-DEBUG] LocalStatus: ${localStatus}, ReservedBy: ${numberItem.reservedBy}, CurrentUser: ${currentUser}`)
+    console.log(`🖱️ [CLICK-DEBUG] LocalStatus: ${localStatus}`)
 
     // Toggle: reservar se ACTIVE, desreservar se RESERVED
     if (canReserve) {
@@ -118,7 +103,7 @@ export function AvailableRaffleNumberListItem({
         {localStatus === 'RESERVED' && (
           <span className="ml-1 text-xs font-bold text-yellow-600">✓</span>
         )}
-        {canUnreserve && (
+        {localStatus === 'RESERVED' && (
           <span className="ml-1 text-xs font-bold text-orange-600" title="Clique para desreservar">↶</span>
         )}
       </div>

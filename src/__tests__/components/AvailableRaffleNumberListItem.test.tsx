@@ -49,7 +49,7 @@ describe('AvailableRaffleNumberListItem', () => {
   })
 
   describe('Unreserve functionality', () => {
-    it('should show unreserve option when number is reserved by current user', () => {
+    it('should show unreserve option when number is reserved', () => {
       const reservedNumberItem = {
         ...mockNumberItem,
         status: 'RESERVED' as const,
@@ -58,15 +58,15 @@ describe('AvailableRaffleNumberListItem', () => {
 
       render(<AvailableRaffleNumberListItem {...mockProps} numberItem={reservedNumberItem} />)
       
-      // Verificar se o número tem a classe correta para unreserve
+      // Verificar se o número tem a classe correta (laranja para todos os reservados)
       const numberElement = screen.getByText('123').closest('div')?.parentElement
       expect(numberElement).toHaveClass('bg-orange-100')
       
-      // Verificar se tem o ícone de unreserve
+      // Verificar se tem o ícone de unreserve (frontend sempre mostra, backend decide)
       expect(screen.getByTitle('Clique para desreservar')).toBeInTheDocument()
     })
 
-    it('should not show unreserve option when number is reserved by different user', () => {
+    it('should show unreserve option for any reserved number (backend decides)', () => {
       const reservedNumberItem = {
         ...mockNumberItem,
         status: 'RESERVED' as const,
@@ -75,15 +75,15 @@ describe('AvailableRaffleNumberListItem', () => {
 
       render(<AvailableRaffleNumberListItem {...mockProps} numberItem={reservedNumberItem} />)
       
-      // Verificar se o número tem a classe correta (não pode unreserve)
+      // Verificar se o número tem a classe correta (laranja para todos os reservados)
       const numberElement = screen.getByText('123').closest('div')?.parentElement
-      expect(numberElement).toHaveClass('bg-yellow-100')
+      expect(numberElement).toHaveClass('bg-orange-100')
       
-      // Verificar se não tem o ícone de unreserve
-      expect(screen.queryByTitle('Clique para desreservar')).not.toBeInTheDocument()
+      // Verificar se tem o ícone de unreserve (frontend sempre mostra, backend decide)
+      expect(screen.getByTitle('Clique para desreservar')).toBeInTheDocument()
     })
 
-    it('should call unreserveRaffleNumber when clicking on reserved number by current user', async () => {
+    it('should call unreserveRaffleNumber when clicking on reserved number', async () => {
       const reservedNumberItem = {
         ...mockNumberItem,
         status: 'RESERVED' as const,
@@ -125,9 +125,9 @@ describe('AvailableRaffleNumberListItem', () => {
       })
     })
 
-    it('should not allow unreserve when user is not authenticated', () => {
+    it('should show unreserve option even when user is not authenticated (backend handles auth)', () => {
       mockLocalStorage.getItem.mockReturnValue(null)
-      
+
       const reservedNumberItem = {
         ...mockNumberItem,
         status: 'RESERVED' as const,
@@ -136,12 +136,12 @@ describe('AvailableRaffleNumberListItem', () => {
 
       render(<AvailableRaffleNumberListItem {...mockProps} numberItem={reservedNumberItem} />)
       
-      // Verificar se o número tem a classe correta (não pode unreserve)
+      // Verificar se o número tem a classe correta (laranja para todos os reservados)
       const numberElement = screen.getByText('123').closest('div')?.parentElement
-      expect(numberElement).toHaveClass('bg-yellow-100')
+      expect(numberElement).toHaveClass('bg-orange-100')
       
-      // Verificar se não tem o ícone de unreserve
-      expect(screen.queryByTitle('Clique para desreservar')).not.toBeInTheDocument()
+      // Verificar se tem o ícone de unreserve (frontend sempre mostra, backend decide)
+      expect(screen.getByTitle('Clique para desreservar')).toBeInTheDocument()
     })
   })
 
