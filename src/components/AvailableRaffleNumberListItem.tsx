@@ -26,10 +26,16 @@ export function AvailableRaffleNumberListItem({
   }, [numberItem.status])
 
   const getStatusClasses = (status: RaffleNumberStatus) => {
+    const currentUser = localStorage.getItem('auth-username')
+    const isReservedByCurrentUser = status === 'RESERVED' && numberItem.reservedBy === currentUser
+    
     switch (status) {
       case 'ACTIVE':
         return 'bg-green-100 border-green-300 text-green-800 cursor-pointer hover:bg-green-200'
       case 'RESERVED':
+        if (isReservedByCurrentUser) {
+          return 'bg-orange-100 border-orange-300 text-orange-800 cursor-pointer hover:bg-orange-200'
+        }
         return 'bg-yellow-100 border-yellow-300 text-yellow-800 cursor-not-allowed'
       case 'SOLD':
         return 'bg-gray-200 border-gray-400 text-gray-700 cursor-not-allowed'
@@ -39,7 +45,11 @@ export function AvailableRaffleNumberListItem({
   }
   
   const canReserve = localStatus === 'ACTIVE' && !isReserving
-  const canUnreserve = localStatus === 'RESERVED' && !isReserving && numberItem.reservedBy === localStorage.getItem('auth-username')
+  const currentUser = localStorage.getItem('auth-username')
+  const canUnreserve = localStatus === 'RESERVED' && !isReserving && numberItem.reservedBy === currentUser
+  
+  // Debug log para verificar comparação
+  console.log(`🔍 [UNRESERVE-DEBUG] Number: ${numberItem.number}, Status: ${localStatus}, ReservedBy: ${numberItem.reservedBy}, CurrentUser: ${currentUser}, CanUnreserve: ${canUnreserve}`)
 
   const handleClick = async () => {
 
@@ -65,11 +75,13 @@ export function AvailableRaffleNumberListItem({
       setLocalStatus('ACTIVE')
       try {
         await raffleService.unreserveRaffleNumber(raffleId, numberItem.number)
+        console.log(`✅ [UNRESERVE] Número ${numberItem.number} desreservado com sucesso`)
         // Reutilizamos o callback de sucesso para refresh, a mensagem virá do List
         onReserveSuccess?.(numberItem.number)
       } catch (error: unknown) {
         setLocalStatus('RESERVED')
         const errorMessage = getErrorMessage(error)
+        console.error(`❌ [UNRESERVE] Erro ao desreservar número ${numberItem.number}:`, errorMessage)
         onReserveError?.(errorMessage)
       } finally {
         setIsReserving(false)
@@ -83,7 +95,7 @@ export function AvailableRaffleNumberListItem({
   return (
     <div
       className={`border rounded p-2 text-center transition-all duration-200 ${statusClasses} ${
-        canReserve ? 'hover:shadow-md' : ''
+        (canReserve || canUnreserve) ? 'hover:shadow-md' : ''
       }`}
       onClick={handleClick}
     >
@@ -94,6 +106,9 @@ export function AvailableRaffleNumberListItem({
         )}
         {localStatus === 'RESERVED' && (
           <span className="ml-1 text-xs font-bold text-yellow-600">✓</span>
+        )}
+        {canUnreserve && (
+          <span className="ml-1 text-xs font-bold text-orange-600" title="Clique para desreservar">↶</span>
         )}
       </div>
       {(numberItem.buyerName || numberItem.owner) && (
