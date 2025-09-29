@@ -86,6 +86,18 @@ export class RaffleService {
   }
 
   /**
+   * Lista rifas públicas com paginação
+   */
+  async getPublicRafflesWithPagination(page: number = 0, size: number = 10): Promise<ApiResponse<RafflePageResponse>> {
+    console.log(`🌐 [RAFFLE] Buscando rifas públicas com paginação - página ${page}, tamanho ${size}`)
+    
+    const response = await this.raffleApiService.get<RafflePageResponse>(`/v1/raffles/public/page?page=${page}&size=${size}`)
+    
+    console.log('📊 [RAFFLE] Página de rifas públicas encontrada:', response)
+    return response
+  }
+
+  /**
    * Lista rifas do usuário com paginação
    */
   async getMyRafflesWithPagination(page: number = 0, size: number = 10): Promise<ApiResponse<RafflePageResponse>> {
@@ -130,6 +142,18 @@ export class RaffleService {
     const response = await this.raffleApiService.get<RaffleNumbersResponse>(`/v1/raffles/${raffleId}/numbers?page=${page}&size=${size}`)
     
     console.log('📊 [RAFFLE] Números da rifa encontrados:', response)
+    return response
+  }
+
+  /**
+   * Busca os números públicos de uma rifa específica
+   */
+  async getPublicRaffleNumbers(raffleId: string, page: number = 0, size: number = 20): Promise<ApiResponse<RaffleNumbersResponse>> {
+    console.log(`🔢 [RAFFLE] Buscando números públicos da rifa ID: ${raffleId} - página ${page}, tamanho ${size}`)
+    
+    const response = await this.raffleApiService.get<RaffleNumbersResponse>(`/v1/raffles/${raffleId}/numbers/public?page=${page}&size=${size}`)
+    
+    console.log('📊 [RAFFLE] Números públicos da rifa encontrados:', response)
     return response
   }
 

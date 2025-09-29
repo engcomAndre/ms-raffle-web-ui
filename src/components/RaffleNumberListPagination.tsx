@@ -58,7 +58,7 @@ export function RaffleNumberListPagination({
         </select>
       </div>
 
-      {/* Navegação de páginas */}
+      {/* Navegação de páginas - só renderiza se houver mais de 1 página */}
       {totalPages > 1 && (
         <div className="flex items-center space-x-2">
           {/* Botão página anterior */}
