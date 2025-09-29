@@ -67,43 +67,45 @@ export function RaffleListPagination({
         </select>
       </div>
 
-      {/* Navegação de páginas */}
-      <div className="flex items-center space-x-2">
-        {/* Botão página anterior */}
-        <button
-          onClick={() => {
-            console.log('🔄 [RAFFLE-LIST-PAGINATION] Clicou em página anterior, página atual:', currentPage)
-            onPageChange(currentPage - 1)
-          }}
-          disabled={currentPage <= 0 || isLoading}
-          className="flex items-center justify-center w-8 h-8 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border border-blue-200"
-          title="Página anterior"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
+      {/* Navegação de páginas - só renderiza se houver mais de 1 página */}
+      {totalPages > 1 && (
+        <div className="flex items-center space-x-2">
+          {/* Botão página anterior */}
+          <button
+            onClick={() => {
+              console.log('🔄 [RAFFLE-LIST-PAGINATION] Clicou em página anterior, página atual:', currentPage)
+              onPageChange(currentPage - 1)
+            }}
+            disabled={currentPage <= 0 || isLoading}
+            className="flex items-center justify-center w-8 h-8 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border border-blue-200"
+            title="Página anterior"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
 
-        {/* Informação da página atual */}
-        <span className="text-sm font-medium text-gray-700 bg-gray-50 px-3 py-1 rounded-md border border-gray-200 whitespace-nowrap">
-          Página {currentPage + 1} de {totalPages}
-        </span>
+          {/* Informação da página atual */}
+          <span className="text-sm font-medium text-gray-700 bg-gray-50 px-3 py-1 rounded-md border border-gray-200 whitespace-nowrap">
+            Página {currentPage + 1} de {totalPages}
+          </span>
 
-        {/* Botão próxima página */}
-        <button
-          onClick={() => {
-            console.log('🔄 [RAFFLE-LIST-PAGINATION] Clicou em próxima página, página atual:', currentPage)
-            onPageChange(currentPage + 1)
-          }}
-          disabled={currentPage >= totalPages - 1 || isLoading}
-          className="flex items-center justify-center w-8 h-8 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border border-blue-200"
-          title="Próxima página"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-      </div>
+          {/* Botão próxima página */}
+          <button
+            onClick={() => {
+              console.log('🔄 [RAFFLE-LIST-PAGINATION] Clicou em próxima página, página atual:', currentPage)
+              onPageChange(currentPage + 1)
+            }}
+            disabled={currentPage >= totalPages - 1 || isLoading}
+            className="flex items-center justify-center w-8 h-8 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border border-blue-200"
+            title="Próxima página"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      )}
     </div>
   )
 }
