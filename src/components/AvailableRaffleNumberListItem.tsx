@@ -30,7 +30,7 @@ export function AvailableRaffleNumberListItem({
       case 'ACTIVE':
         return 'bg-green-100 border-green-300 text-green-800 cursor-pointer hover:bg-green-200'
       case 'RESERVED':
-        return 'bg-yellow-100 border-yellow-300 text-yellow-800 cursor-not-allowed'
+        return 'bg-yellow-100 border-yellow-300 text-yellow-800 cursor-pointer hover:bg-yellow-200'
       case 'SOLD':
         return 'bg-gray-200 border-gray-400 text-gray-700 cursor-not-allowed'
       default:
@@ -39,19 +39,19 @@ export function AvailableRaffleNumberListItem({
   }
   
   const canReserve = localStatus === 'ACTIVE' && !isReserving
-  const canUnreserve = localStatus === 'RESERVED' && !isReserving && numberItem.reservedBy === localStorage.getItem('auth-username')
+  const canUnreserve = localStatus === 'RESERVED' && !isReserving
 
   const handleClick = async () => {
 
     // Toggle: reservar se ACTIVE, desreservar se RESERVED
     if (canReserve) {
       setIsReserving(true)
-      setLocalStatus('RESERVED')
+      setLocalStatus('RESERVED' as RaffleNumberStatus)
       try {
-        await raffleService.reserveRaffleNumber(raffleId, numberItem.number)
-        onReserveSuccess?.(numberItem.number)
+        await raffleService.reserveRaffleNumber(raffleId, Number(numberItem.number))
+        onReserveSuccess?.(Number(numberItem.number))
       } catch (error: unknown) {
-        setLocalStatus('ACTIVE')
+        setLocalStatus('ACTIVE' as RaffleNumberStatus)
         const errorMessage = getErrorMessage(error)
         onReserveError?.(errorMessage)
       } finally {
@@ -62,13 +62,13 @@ export function AvailableRaffleNumberListItem({
 
     if (canUnreserve) {
       setIsReserving(true)
-      setLocalStatus('ACTIVE')
+      setLocalStatus('ACTIVE' as RaffleNumberStatus)
       try {
-        await raffleService.unreserveRaffleNumber(raffleId, numberItem.number)
+        await raffleService.unreserveRaffleNumber(raffleId, Number(numberItem.number))
         // Reutilizamos o callback de sucesso para refresh, a mensagem virá do List
-        onReserveSuccess?.(numberItem.number)
+        onReserveSuccess?.(Number(numberItem.number))
       } catch (error: unknown) {
-        setLocalStatus('RESERVED')
+        setLocalStatus('RESERVED' as RaffleNumberStatus)
         const errorMessage = getErrorMessage(error)
         onReserveError?.(errorMessage)
       } finally {
@@ -83,7 +83,7 @@ export function AvailableRaffleNumberListItem({
   return (
     <div
       className={`border rounded p-2 text-center transition-all duration-200 ${statusClasses} ${
-        canReserve ? 'hover:shadow-md' : ''
+        (canReserve || canUnreserve) ? 'hover:shadow-md' : ''
       }`}
       onClick={handleClick}
     >
