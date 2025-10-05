@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { RaffleResponse } from '@/types/raffle'
 import { AvailableRaffleNumberListContainer } from './AvailableRaffleNumberListContainer'
+import { RaffleImageCarousel } from './RaffleImageCarousel'
 
 interface AvailableRaffleListItemProps {
   raffle: RaffleResponse
@@ -62,6 +63,11 @@ export function AvailableRaffleListItem({
     <div className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
       <div className="p-6">
         <div className="flex items-start justify-between">
+          {/* Carrossel de Imagens */}
+          <div className="mr-6">
+            <RaffleImageCarousel images={raffle.files || []} />
+          </div>
+          
           <div className="flex-1">
             <div className="flex items-center space-x-3 mb-2">
               <h3 className="text-lg font-semibold text-gray-900">{raffle.title}</h3>
