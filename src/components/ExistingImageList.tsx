@@ -46,8 +46,11 @@ export function ExistingImageList({ raffleId, imageUrls, onImageDeleted, disable
   }
 
   if (imageUrls.length === 0) {
+    console.log('🚫 [EXISTING-IMAGE-LIST] Nenhuma imagem encontrada, retornando null')
     return null
   }
+
+  console.log('✅ [EXISTING-IMAGE-LIST] Renderizando lista com', imageUrls.length, 'imagens')
 
   return (
     <div className="space-y-3">
