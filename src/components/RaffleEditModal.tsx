@@ -33,6 +33,9 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
   // Carregar dados da rifa quando o modal abrir
   useEffect(() => {
     if (isOpen && raffle) {
+      console.log('🔍 [RAFFLE-EDIT-MODAL] Carregando dados da rifa:', raffle)
+      console.log('📁 [RAFFLE-EDIT-MODAL] Arquivos da rifa:', raffle.files)
+      
       const maxNumbers = raffle.maxNumbers || 0
       setFormData({
         title: raffle.title || '',
@@ -43,16 +46,9 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
       })
       setOriginalMaxNumbers(maxNumbers)
       setExistingImages(raffle.files || [])
+      console.log('✅ [RAFFLE-EDIT-MODAL] Existing images setadas:', raffle.files || [])
       setError(null)
       setSuccessMessage(null)
-      
-      // Debug logs
-      console.log('🔍 [RAFFLE-EDIT-MODAL] Dados da rifa carregados:', {
-        raffleId: raffle.id,
-        title: raffle.title,
-        files: raffle.files,
-        filesLength: raffle.files?.length
-      })
     }
   }, [isOpen, raffle])
 

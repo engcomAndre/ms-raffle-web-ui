@@ -11,13 +11,9 @@ interface ExistingImageListProps {
 export function ExistingImageList({ raffleId, imageUrls, onImageDeleted, disabled = false }: ExistingImageListProps) {
   const [deletingImages, setDeletingImages] = useState<Set<string>>(new Set())
 
-  // Debug logs
-  console.log('🔍 [EXISTING-IMAGES] Props recebidas:', {
-    raffleId,
-    imageUrls,
-    imageUrlsLength: imageUrls?.length,
-    disabled
-  })
+  console.log('🖼️ [EXISTING-IMAGE-LIST] Renderizando com URLs:', imageUrls)
+  console.log('🖼️ [EXISTING-IMAGE-LIST] Raffle ID:', raffleId)
+  console.log('🖼️ [EXISTING-IMAGE-LIST] Quantidade de imagens:', imageUrls.length)
 
   const handleDeleteImage = async (imageUrl: string) => {
     if (disabled || deletingImages.has(imageUrl)) return
