@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { raffleService } from '@/services/raffleService'
 import { RaffleCreationData } from '@/types/raffle'
+import { InlineImageUpload } from './InlineImageUpload'
+import { fileUploadService } from '@/services/fileUploadService'
 
 interface CreateRaffleModalProps {
   isOpen: boolean
@@ -13,6 +15,7 @@ interface CreateRaffleModalProps {
 export function CreateRaffleModal({ isOpen, onClose, onSuccess }: CreateRaffleModalProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [selectedImages, setSelectedImages] = useState<File[]>([])
 
   const [formData, setFormData] = useState<RaffleCreationData>({
     title: '',
@@ -48,6 +51,10 @@ export function CreateRaffleModal({ isOpen, onClose, onSuccess }: CreateRaffleMo
     }))
   }
 
+  const handleImagesChange = (images: File[]) => {
+    setSelectedImages(images)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -74,11 +81,35 @@ export function CreateRaffleModal({ isOpen, onClose, onSuccess }: CreateRaffleMo
         throw new Error('Data de fim deve ser posterior à data de início')
       }
 
-      const response = await raffleService.createRaffle(formData)
+      // Criar rifa primeiro (sem imagens)
+      const raffleData = {
+        ...formData,
+        files: [] // Criar rifa sem imagens primeiro
+      }
+
+      const response = await raffleService.createRaffle(raffleData)
       
-      if (response.success) {
+      if (response.success && response.data) {
+        // Fazer upload das imagens se houver
+        if (selectedImages.length > 0) {
+          const uploadPromises = selectedImages.map(image => 
+            fileUploadService.uploadRaffleImage(response.data.id, image)
+          )
+          
+          const uploadResults = await Promise.all(uploadPromises)
+          
+          // Verificar se algum upload falhou
+          const failedUploads = uploadResults.filter(result => !result.success)
+          if (failedUploads.length > 0) {
+            console.warn('Alguns uploads falharam:', failedUploads)
+            // Não falhar o processo todo, apenas avisar
+          }
+        }
+
+        // Sucesso - fechar modal e notificar
         onSuccess()
         onClose()
+        
         // Reset form
         setFormData({
           title: '',
@@ -88,6 +119,7 @@ export function CreateRaffleModal({ isOpen, onClose, onSuccess }: CreateRaffleMo
           startAt: '',
           endAt: ''
         })
+        setSelectedImages([])
       } else {
         throw new Error(response.error || 'Erro ao criar rifa')
       }
@@ -101,6 +133,16 @@ export function CreateRaffleModal({ isOpen, onClose, onSuccess }: CreateRaffleMo
   const handleClose = () => {
     if (!isLoading) {
       setError(null)
+      setSelectedImages([])
+      // Reset form
+      setFormData({
+        title: '',
+        prize: '',
+        maxNumbers: 100,
+        files: [],
+        startAt: '',
+        endAt: ''
+      })
       onClose()
     }
   }
@@ -257,6 +299,27 @@ export function CreateRaffleModal({ isOpen, onClose, onSuccess }: CreateRaffleMo
                   required
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Seção de Upload de Imagens */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-medium text-gray-900">Imagens da Rifa</h3>
+              <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                Opcional • Até 5 imagens
+              </div>
+            </div>
+            
+            <InlineImageUpload
+              onImagesChange={handleImagesChange}
+              maxImages={5}
+              disabled={isLoading}
+            />
+            
+            <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+              <p className="font-medium mb-1">💡 Dica:</p>
+              <p>Adicione imagens do prêmio para atrair mais participantes! As imagens serão enviadas automaticamente após criar a rifa.</p>
             </div>
           </div>
 

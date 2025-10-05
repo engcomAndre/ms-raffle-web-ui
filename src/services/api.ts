@@ -99,12 +99,37 @@ export class ApiService {
       console.log(`📋 [API] Método: ${options.method || 'GET'}`)
       
       const authHeaders = this.getAuthHeaders(includeAuth)
+      
+      // Se o body for FormData, não definir Content-Type (deixar o browser definir)
+      const isFormData = options.body instanceof FormData
+      
+      // Preparar headers baseados no tipo de body
+      let configHeaders: Record<string, string> = {}
+      
+      if (isFormData) {
+        // Para FormData, usar apenas authHeaders (sem Content-Type)
+        configHeaders = { ...authHeaders }
+        // Remover Content-Type se existir nos authHeaders
+        delete configHeaders['Content-Type']
+      } else {
+        // Para JSON, definir Content-Type
+        configHeaders = { 
+          'Content-Type': 'application/json',
+          ...authHeaders 
+        }
+      }
+      
+      // Mesclar com headers customizados do options
+      const finalHeaders = { ...configHeaders, ...options.headers }
+      
+      // Remover Content-Type se for undefined
+      if (finalHeaders['Content-Type'] === undefined) {
+        delete finalHeaders['Content-Type']
+      }
+      
       const config: RequestInit = {
         ...options,
-        headers: {
-          ...authHeaders,
-          ...options.headers,
-        },
+        headers: finalHeaders,
       }
       
       console.log(`📦 [API] Headers:`, config.headers)
