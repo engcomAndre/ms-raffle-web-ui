@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { DashboardLayout } from '@/components/DashboardLayout'
 import { RaffleListContainer } from '@/components/RaffleListContainer'
+import { DebugRaffleComponent } from '@/components/DebugRaffleComponent'
 
 export default function PlaygroundPage() {
   const router = useRouter()
@@ -50,8 +51,11 @@ export default function PlaygroundPage() {
 
   return (
     <DashboardLayout currentPage="Minhas Rifas">
-      {/* Lista de Rifas */}
-      <RaffleListContainer />
+      <div className="space-y-6">
+        <DebugRaffleComponent />
+        {/* Lista de Rifas */}
+        <RaffleListContainer />
+      </div>
     </DashboardLayout>
   )
 }
