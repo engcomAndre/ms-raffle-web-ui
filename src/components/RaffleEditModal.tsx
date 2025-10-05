@@ -45,6 +45,14 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
       setExistingImages(raffle.files || [])
       setError(null)
       setSuccessMessage(null)
+      
+      // Debug logs
+      console.log('🔍 [RAFFLE-EDIT-MODAL] Dados da rifa carregados:', {
+        raffleId: raffle.id,
+        title: raffle.title,
+        files: raffle.files,
+        filesLength: raffle.files?.length
+      })
     }
   }, [isOpen, raffle])
 
