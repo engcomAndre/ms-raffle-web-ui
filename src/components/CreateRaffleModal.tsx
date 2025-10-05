@@ -229,7 +229,7 @@ export function CreateRaffleModal({ isOpen, onClose, onSuccess }: CreateRaffleMo
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-sm font-medium text-gray-700">
-                Imagens da Rifa
+                Imagens dos Prêmios da Rifa
               </label>
               <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
                 Opcional • Até 5 imagens
