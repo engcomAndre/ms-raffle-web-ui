@@ -201,17 +201,20 @@ describe('RaffleSaleModal', () => {
       expect(screen.getByText('1')).toBeInTheDocument()
     })
 
-    // Selecionar número 1
-    fireEvent.click(screen.getByText('1'))
-    expect(screen.getByText('1 de 3 selecionados')).toBeInTheDocument()
-
-    // Selecionar número 2
-    fireEvent.click(screen.getByText('2'))
-    expect(screen.getByText('2 de 3 selecionados')).toBeInTheDocument()
+    // Todos os números já estão pré-selecionados (3 de 3)
+    expect(screen.getByText('3 de 3 selecionados')).toBeInTheDocument()
 
     // Deselecionar número 1
     fireEvent.click(screen.getByText('1'))
+    expect(screen.getByText('2 de 3 selecionados')).toBeInTheDocument()
+
+    // Deselecionar número 2
+    fireEvent.click(screen.getByText('2'))
     expect(screen.getByText('1 de 3 selecionados')).toBeInTheDocument()
+
+    // Selecionar número 1 novamente
+    fireEvent.click(screen.getByText('1'))
+    expect(screen.getByText('2 de 3 selecionados')).toBeInTheDocument()
   })
 
   it('should allow selecting all numbers', async () => {
@@ -225,18 +228,21 @@ describe('RaffleSaleModal', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText('Selecionar todos')).toBeInTheDocument()
+      expect(screen.getByText('Desmarcar todos')).toBeInTheDocument()
     })
 
-    // Selecionar todos
-    fireEvent.click(screen.getByText('Selecionar todos'))
+    // Todos já estão selecionados inicialmente
     expect(screen.getByText('3 de 3 selecionados')).toBeInTheDocument()
-    expect(screen.getByText('Desmarcar todos')).toBeInTheDocument()
 
     // Desmarcar todos
     fireEvent.click(screen.getByText('Desmarcar todos'))
     expect(screen.getByText('0 de 3 selecionados')).toBeInTheDocument()
     expect(screen.getByText('Selecionar todos')).toBeInTheDocument()
+
+    // Selecionar todos novamente
+    fireEvent.click(screen.getByText('Selecionar todos'))
+    expect(screen.getByText('3 de 3 selecionados')).toBeInTheDocument()
+    expect(screen.getByText('Desmarcar todos')).toBeInTheDocument()
   })
 
   it('should enable confirm button when numbers are selected', async () => {
@@ -253,10 +259,8 @@ describe('RaffleSaleModal', () => {
       expect(screen.getByText('1')).toBeInTheDocument()
     })
 
-    // Selecionar um número
-    fireEvent.click(screen.getByText('1'))
-
-    const confirmButton = screen.getByText('Confirmar Venda (1)')
+    // Todos os números já estão pré-selecionados
+    const confirmButton = screen.getByText('Confirmar Venda (3)')
     expect(confirmButton).not.toBeDisabled()
   })
 
@@ -275,17 +279,16 @@ describe('RaffleSaleModal', () => {
       expect(screen.getByText('1')).toBeInTheDocument()
     })
 
-    // Selecionar números
+    // Deselecionar um número (todos já estão selecionados)
     fireEvent.click(screen.getByText('1'))
-    fireEvent.click(screen.getByText('2'))
 
-    // Confirmar venda
+    // Confirmar venda dos números restantes
     fireEvent.click(screen.getByText('Confirmar Venda (2)'))
 
     await waitFor(() => {
       expect(raffleService.sellRaffleNumber).toHaveBeenCalledTimes(2)
-      expect(raffleService.sellRaffleNumber).toHaveBeenCalledWith('test-raffle-id', 1)
       expect(raffleService.sellRaffleNumber).toHaveBeenCalledWith('test-raffle-id', 2)
+      expect(raffleService.sellRaffleNumber).toHaveBeenCalledWith('test-raffle-id', 3)
     })
 
     await waitFor(() => {
@@ -311,9 +314,8 @@ describe('RaffleSaleModal', () => {
       expect(screen.getByText('1')).toBeInTheDocument()
     })
 
-    // Selecionar números
+    // Deselecionar um número (todos já estão selecionados)
     fireEvent.click(screen.getByText('1'))
-    fireEvent.click(screen.getByText('2'))
 
     // Confirmar venda
     fireEvent.click(screen.getByText('Confirmar Venda (2)'))
@@ -339,8 +341,9 @@ describe('RaffleSaleModal', () => {
       expect(screen.getByText('1')).toBeInTheDocument()
     })
 
-    // Selecionar número
+    // Deselecionar dois números (todos já estão selecionados)
     fireEvent.click(screen.getByText('1'))
+    fireEvent.click(screen.getByText('2'))
 
     // Confirmar venda
     fireEvent.click(screen.getByText('Confirmar Venda (1)'))
@@ -413,8 +416,9 @@ describe('RaffleSaleModal', () => {
       expect(screen.getByText('1')).toBeInTheDocument()
     })
 
-    // Selecionar número
+    // Deselecionar dois números (todos já estão selecionados)
     fireEvent.click(screen.getByText('1'))
+    fireEvent.click(screen.getByText('2'))
 
     // Confirmar venda
     fireEvent.click(screen.getByText('Confirmar Venda (1)'))
@@ -468,8 +472,9 @@ describe('RaffleSaleModal', () => {
       expect(screen.getByText('1')).toBeInTheDocument()
     })
 
-    // Selecionar número
+    // Deselecionar dois números (todos já estão selecionados)
     fireEvent.click(screen.getByText('1'))
+    fireEvent.click(screen.getByText('2'))
 
     // Confirmar venda
     fireEvent.click(screen.getByText('Confirmar Venda (1)'))
@@ -477,5 +482,120 @@ describe('RaffleSaleModal', () => {
     // Verificar estado de venda
     expect(screen.getByText('Vendendo...')).toBeInTheDocument()
     expect(screen.getByText('Vendendo...')).toBeDisabled()
+  })
+
+  it('should pre-select all reserved numbers on load', async () => {
+    render(
+      <RaffleSaleModal
+        isOpen={true}
+        onClose={mockOnClose}
+        raffle={mockRaffle}
+        onSaleSuccess={mockOnSaleSuccess}
+      />
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('1')).toBeInTheDocument()
+    })
+
+    // Verificar que todos os números estão pré-selecionados
+    expect(screen.getByText('3 de 3 selecionados')).toBeInTheDocument()
+    expect(screen.getByText('Confirmar Venda (3)')).toBeInTheDocument()
+  })
+
+  it('should display selected numbers with yellow styling', async () => {
+    render(
+      <RaffleSaleModal
+        isOpen={true}
+        onClose={mockOnClose}
+        raffle={mockRaffle}
+        onSaleSuccess={mockOnSaleSuccess}
+      />
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('1')).toBeInTheDocument()
+    })
+
+    // Verificar que os números selecionados têm a classe de cor amarela
+    const numberButton1 = screen.getByText('1').closest('button')
+    expect(numberButton1).toHaveClass('bg-yellow-100', 'border-yellow-300', 'text-yellow-800')
+    
+    const numberButton2 = screen.getByText('2').closest('button')
+    expect(numberButton2).toHaveClass('bg-yellow-100', 'border-yellow-300', 'text-yellow-800')
+    
+    const numberButton3 = screen.getByText('3').closest('button')
+    expect(numberButton3).toHaveClass('bg-yellow-100', 'border-yellow-300', 'text-yellow-800')
+  })
+
+  it('should show hover effect with yellow border on unselected numbers', async () => {
+    render(
+      <RaffleSaleModal
+        isOpen={true}
+        onClose={mockOnClose}
+        raffle={mockRaffle}
+        onSaleSuccess={mockOnSaleSuccess}
+      />
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('1')).toBeInTheDocument()
+    })
+
+    // Deselecionar um número primeiro
+    fireEvent.click(screen.getByText('1'))
+
+    // Verificar que o número deselecionado tem hover amarelo
+    const numberButton = screen.getByText('1').closest('button')
+    expect(numberButton).toHaveClass('hover:border-yellow-300')
+  })
+
+  it('should allow deselecting pre-selected numbers', async () => {
+    render(
+      <RaffleSaleModal
+        isOpen={true}
+        onClose={mockOnClose}
+        raffle={mockRaffle}
+        onSaleSuccess={mockOnSaleSuccess}
+      />
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('1')).toBeInTheDocument()
+    })
+
+    // Todos os números já estão pré-selecionados (3 de 3)
+    expect(screen.getByText('3 de 3 selecionados')).toBeInTheDocument()
+    expect(screen.getByText('Confirmar Venda (3)')).toBeInTheDocument()
+
+    // Deselecionar um número
+    fireEvent.click(screen.getByText('1'))
+
+    expect(screen.getByText('2 de 3 selecionados')).toBeInTheDocument()
+    expect(screen.getByText('Confirmar Venda (2)')).toBeInTheDocument()
+  })
+
+  it('should allow deselecting all pre-selected numbers', async () => {
+    render(
+      <RaffleSaleModal
+        isOpen={true}
+        onClose={mockOnClose}
+        raffle={mockRaffle}
+        onSaleSuccess={mockOnSaleSuccess}
+      />
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('Desmarcar todos')).toBeInTheDocument()
+    })
+
+    // Todos os números já estão pré-selecionados
+    expect(screen.getByText('3 de 3 selecionados')).toBeInTheDocument()
+
+    // Desmarcar todos
+    fireEvent.click(screen.getByText('Desmarcar todos'))
+
+    expect(screen.getByText('0 de 3 selecionados')).toBeInTheDocument()
+    expect(screen.getByText('Selecionar todos')).toBeInTheDocument()
   })
 })

@@ -183,7 +183,7 @@ describe('RaffleNumberListContainer - Sale Functionality', () => {
     await waitFor(() => {
       const sellButton = screen.getByText('Vender')
       expect(sellButton).toBeInTheDocument()
-      expect(sellButton).toHaveClass('text-green-700', 'bg-green-50', 'hover:bg-green-100')
+      expect(sellButton).toHaveClass('text-blue-700', 'bg-blue-50', 'hover:bg-blue-100')
     })
   })
 

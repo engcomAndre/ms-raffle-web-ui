@@ -5,22 +5,22 @@ import { RaffleNumberItemResponse, RaffleResponse } from '@/types/raffle'
 import { raffleService } from '@/services/raffleService'
 import { Toast } from './Toast'
 
-interface RaffleSaleModalProps {
+interface RafflePurchaseModalProps {
   isOpen: boolean
   onClose: () => void
   raffle: RaffleResponse
-  onSaleSuccess?: () => void
+  onPurchaseSuccess?: () => void
 }
 
-export function RaffleSaleModal({ 
+export function RafflePurchaseModal({ 
   isOpen, 
   onClose, 
   raffle, 
-  onSaleSuccess 
-}: RaffleSaleModalProps) {
-  const [reservedNumbers, setReservedNumbers] = useState<RaffleNumberItemResponse[]>([])
+  onPurchaseSuccess 
+}: RafflePurchaseModalProps) {
+  const [availableNumbers, setAvailableNumbers] = useState<RaffleNumberItemResponse[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const [isSelling, setIsSelling] = useState(false)
+  const [isPurchasing, setIsPurchasing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' | 'info' } | null>(null)
   const [selectedNumbers, setSelectedNumbers] = useState<Set<number>>(new Set())
@@ -55,14 +55,14 @@ export function RaffleSaleModal({
       setError(null)
       
       // Buscar todos os números da rifa (pode precisar de paginação para rifas grandes)
-      const response = await raffleService.getRaffleNumbers(raffle.id, 0, 1000)
+      const response = await raffleService.getPublicRaffleNumbers(raffle.id, 0, 1000)
       
       if (response.success && response.data) {
-        // Filtrar apenas os números reservados
+        // Filtrar apenas os números reservados (RESERVED)
         const reserved = response.data.rafflesNumbers.filter(
           (number: RaffleNumberItemResponse) => number.status === 'RESERVED'
         )
-        setReservedNumbers(reserved)
+        setAvailableNumbers(reserved)
         
         // Pré-selecionar todos os números reservados
         const reservedNumbers = reserved.map(n => parseInt(n.number))
@@ -89,69 +89,69 @@ export function RaffleSaleModal({
   }
 
   const handleSelectAll = () => {
-    if (selectedNumbers.size === reservedNumbers.length) {
+    if (selectedNumbers.size === availableNumbers.length) {
       setSelectedNumbers(new Set())
     } else {
-      setSelectedNumbers(new Set(reservedNumbers.map(n => parseInt(n.number))))
+      setSelectedNumbers(new Set(availableNumbers.map(n => parseInt(n.number))))
     }
   }
 
-  const handleConfirmSale = async () => {
+  const handleConfirmPurchase = async () => {
     if (selectedNumbers.size === 0) {
       setToast({
-        message: 'Selecione pelo menos um número para vender',
+        message: 'Selecione pelo menos um número para comprar',
         type: 'warning'
       })
       return
     }
 
     try {
-      setIsSelling(true)
+      setIsPurchasing(true)
       setError(null)
 
-      // Vender cada número selecionado
-      const salePromises = Array.from(selectedNumbers).map(number => 
+      // Comprar cada número selecionado
+      const purchasePromises = Array.from(selectedNumbers).map(number => 
         raffleService.sellRaffleNumber(raffle.id, number)
       )
 
-      const results = await Promise.allSettled(salePromises)
+      const results = await Promise.allSettled(purchasePromises)
       
-      // Verificar se todas as vendas foram bem-sucedidas
-      const failedSales = results.filter(result => result.status === 'rejected')
+      // Verificar se todas as compras foram bem-sucedidas
+      const failedPurchases = results.filter(result => result.status === 'rejected')
       
-      if (failedSales.length === 0) {
+      if (failedPurchases.length === 0) {
         setToast({
-          message: `${selectedNumbers.size} número(s) vendido(s) com sucesso!`,
+          message: `${selectedNumbers.size} número(s) comprado(s) com sucesso!`,
           type: 'success'
         })
         
         // Fechar modal após sucesso
         setTimeout(() => {
-          onSaleSuccess?.()
+          onPurchaseSuccess?.()
           onClose()
         }, 1500)
       } else {
-        const successCount = results.length - failedSales.length
+        const successCount = results.length - failedPurchases.length
         if (successCount > 0) {
           setToast({
-            message: `${successCount} número(s) vendido(s) com sucesso. ${failedSales.length} falharam.`,
+            message: `${successCount} número(s) comprado(s) com sucesso. ${failedPurchases.length} falharam.`,
             type: 'warning'
           })
         } else {
           setToast({
-            message: 'Erro ao vender os números selecionados',
+            message: 'Erro ao comprar os números selecionados',
             type: 'error'
           })
         }
       }
     } catch (error) {
-      console.error('Erro ao vender números:', error)
+      console.error('Erro ao comprar números:', error)
       setToast({
-        message: 'Erro ao vender os números selecionados',
+        message: 'Erro ao comprar os números selecionados',
         type: 'error'
       })
     } finally {
-      setIsSelling(false)
+      setIsPurchasing(false)
     }
   }
 
@@ -170,7 +170,7 @@ export function RaffleSaleModal({
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">
-            Vender Números Reservados
+            Comprar Números Reservados
           </h3>
           <button
             onClick={handleClose}
@@ -192,6 +192,9 @@ export function RaffleSaleModal({
                 : raffle.description
               }
             </p>
+            <div className="mt-2 text-sm text-gray-500">
+              <span className="font-medium">Prêmio:</span> {raffle.prize || 'Não definido'}
+            </div>
           </div>
         </div>
 
@@ -217,14 +220,14 @@ export function RaffleSaleModal({
                 Tentar novamente
               </button>
             </div>
-          ) : reservedNumbers.length === 0 ? (
+          ) : availableNumbers.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-gray-400 mb-2">
                 <svg className="mx-auto h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <p className="text-sm text-gray-500">Nenhum número reservado encontrado</p>
+              <p className="text-sm text-gray-500">Nenhum número reservado para compra</p>
             </div>
           ) : (
             <div>
@@ -235,10 +238,10 @@ export function RaffleSaleModal({
                     onClick={handleSelectAll}
                     className="text-sm text-blue-600 hover:text-blue-800"
                   >
-                    {selectedNumbers.size === reservedNumbers.length ? 'Desmarcar todos' : 'Selecionar todos'}
+                    {selectedNumbers.size === availableNumbers.length ? 'Desmarcar todos' : 'Selecionar todos'}
                   </button>
                   <span className="text-sm text-gray-500">
-                    {selectedNumbers.size} de {reservedNumbers.length} selecionados
+                    {selectedNumbers.size} de {availableNumbers.length} selecionados
                   </span>
                 </div>
                 <button
@@ -252,7 +255,7 @@ export function RaffleSaleModal({
 
               {/* Grid de números */}
               <div className="grid grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 max-h-64 overflow-y-auto">
-                {reservedNumbers.map((number) => {
+                {availableNumbers.map((number) => {
                   const isSelected = selectedNumbers.has(parseInt(number.number))
                   return (
                     <button
@@ -284,11 +287,11 @@ export function RaffleSaleModal({
             Cancelar
           </button>
           <button
-            onClick={handleConfirmSale}
-            disabled={selectedNumbers.size === 0 || isSelling}
+            onClick={handleConfirmPurchase}
+            disabled={selectedNumbers.size === 0 || isPurchasing}
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {isSelling ? 'Vendendo...' : `Confirmar Venda (${selectedNumbers.size})`}
+            {isPurchasing ? 'Comprando...' : `Confirmar Compra (${selectedNumbers.size})`}
           </button>
         </div>
 
@@ -304,4 +307,3 @@ export function RaffleSaleModal({
     </div>
   )
 }
-

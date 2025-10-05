@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { RaffleResponse } from '@/types/raffle'
 import { AvailableRaffleNumberListContainer } from './AvailableRaffleNumberListContainer'
 import { RaffleImageCarousel } from './RaffleImageCarousel'
+import { RafflePurchaseModal } from './RafflePurchaseModal'
 
 interface AvailableRaffleListItemProps {
   raffle: RaffleResponse
@@ -13,9 +14,21 @@ export function AvailableRaffleListItem({
   raffle
 }: AvailableRaffleListItemProps) {
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false)
 
   const handleToggleExpanded = () => {
     setIsExpanded(!isExpanded)
+  }
+
+  const handlePurchaseClick = () => {
+    setIsPurchaseModalOpen(true)
+  }
+
+  const handlePurchaseSuccess = () => {
+    // Recarregar a lista de números se estiver expandida
+    if (isExpanded) {
+      // O AvailableRaffleNumberListContainer já tem refresh automático
+    }
   }
 
   const getStatusBadge = (status: boolean) => {
@@ -103,10 +116,10 @@ export function AvailableRaffleListItem({
           </div>
         </div>
         
-        <div className="mt-4 pt-4 border-t border-gray-200">
+        <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between">
           <button
             onClick={handleToggleExpanded}
-            className="inline-flex items-center text-sm font-medium text-green-600 hover:text-green-500"
+            className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-500"
           >
             <svg 
               className={`w-4 h-4 mr-2 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
@@ -117,6 +130,16 @@ export function AvailableRaffleListItem({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
             {isExpanded ? 'Ocultar números' : 'Ver números da rifa'}
+          </button>
+          
+          <button
+            onClick={handlePurchaseClick}
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
+            </svg>
+            Comprar Números
           </button>
         </div>
       </div>
@@ -130,6 +153,14 @@ export function AvailableRaffleListItem({
           />
         </div>
       )}
+
+      {/* Modal de Compra */}
+      <RafflePurchaseModal
+        isOpen={isPurchaseModalOpen}
+        onClose={() => setIsPurchaseModalOpen(false)}
+        raffle={raffle}
+        onPurchaseSuccess={handlePurchaseSuccess}
+      />
     </div>
   )
 }
