@@ -151,6 +151,61 @@ describe('FileUploadService', () => {
     })
   })
 
+  describe('deleteRaffleImage', () => {
+    const raffleId = 'test-raffle-id'
+    const fileUrl = 'http://localhost:4566/files/test-image.jpg'
+
+    test('should delete file successfully', async () => {
+      mockApiService.request.mockResolvedValue({
+        success: true,
+        data: undefined
+      })
+
+      const result = await fileUploadService.deleteRaffleImage(raffleId, fileUrl)
+
+      expect(result.success).toBe(true)
+      expect(result.message).toBe('Imagem excluída com sucesso')
+      expect(mockApiService.request).toHaveBeenCalledWith(
+        `/v1/raffles/${raffleId}/file?fileUrl=${encodeURIComponent(fileUrl)}`,
+        {
+          method: 'DELETE'
+        }
+      )
+    })
+
+    test('should handle API error response', async () => {
+      mockApiService.request.mockResolvedValue({
+        success: false,
+        error: 'API Error'
+      })
+
+      const result = await fileUploadService.deleteRaffleImage(raffleId, fileUrl)
+
+      expect(result.success).toBe(false)
+      expect(result.error).toBe('API Error')
+    })
+
+    test('should handle API error without error message', async () => {
+      mockApiService.request.mockResolvedValue({
+        success: false
+      })
+
+      const result = await fileUploadService.deleteRaffleImage(raffleId, fileUrl)
+
+      expect(result.success).toBe(false)
+      expect(result.error).toBe('Erro ao excluir a imagem')
+    })
+
+    test('should handle network error', async () => {
+      mockApiService.request.mockRejectedValue(new Error('Network error'))
+
+      const result = await fileUploadService.deleteRaffleImage(raffleId, fileUrl)
+
+      expect(result.success).toBe(false)
+      expect(result.error).toBe('Erro inesperado ao excluir a imagem')
+    })
+  })
+
   describe('createPreviewUrl', () => {
     test('should create preview URL for file', () => {
       const file = new File(['test'], 'test.png', { type: 'image/png' })

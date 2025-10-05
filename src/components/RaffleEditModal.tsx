@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { RaffleResponse } from '@/types/raffle'
 import { raffleService } from '@/services/raffleService'
 import { InlineImageUpload } from './InlineImageUpload'
+import { ExistingImageList } from './ExistingImageList'
 import { fileUploadService } from '@/services/fileUploadService'
 
 interface RaffleEditModalProps {
@@ -19,6 +20,7 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [selectedImages, setSelectedImages] = useState<File[]>([])
+  const [existingImages, setExistingImages] = useState<string[]>([])
   const [formData, setFormData] = useState({
     title: '',
     prize: '',
@@ -40,6 +42,7 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
         endAt: raffle.endAt ? raffle.endAt.split('T')[0] + 'T' + raffle.endAt.split('T')[1].substring(0, 5) : ''
       })
       setOriginalMaxNumbers(maxNumbers)
+      setExistingImages(raffle.files || [])
       setError(null)
       setSuccessMessage(null)
     }
@@ -73,6 +76,11 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
 
   const handleImagesChange = (images: File[]) => {
     setSelectedImages(images)
+  }
+
+  const handleImageDeleted = (deletedUrl: string) => {
+    setExistingImages(prev => prev.filter(url => url !== deletedUrl))
+    console.log('🗑️ [RAFFLE-EDIT-MODAL] Imagem excluída:', deletedUrl)
   }
 
   const handleIncrementNumbers = async () => {
@@ -280,6 +288,16 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
                 <p className="font-medium mb-1">💡 Dica:</p>
                 <p>Adicione imagens do prêmio para atrair mais participantes! As imagens serão enviadas automaticamente após salvar as alterações.</p>
               </div>
+              
+              {/* Listagem de Imagens Existentes */}
+              {raffle && (
+                <ExistingImageList
+                  raffleId={raffle.id}
+                  imageUrls={existingImages}
+                  onImageDeleted={handleImageDeleted}
+                  disabled={isLoading || isIncrementing}
+                />
+              )}
             </div>
 
             {/* Número máximo de números */}

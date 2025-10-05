@@ -7,6 +7,12 @@ export interface FileUploadResponse {
   message?: string
 }
 
+export interface FileDeleteResponse {
+  success: boolean
+  error?: string
+  message?: string
+}
+
 export class FileUploadService {
   private readonly apiService: ApiService
 
@@ -63,6 +69,45 @@ export class FileUploadService {
       return {
         success: false,
         error: 'Erro inesperado ao fazer upload da imagem'
+      }
+    }
+  }
+
+  /**
+   * Exclui uma imagem de uma rifa específica
+   */
+  async deleteRaffleImage(raffleId: string, fileUrl: string): Promise<FileDeleteResponse> {
+    try {
+      console.log('🗑️ [FILE-DELETE] Iniciando exclusão de imagem')
+      console.log('📋 [FILE-DELETE] Rifa ID:', raffleId)
+      console.log('🔗 [FILE-DELETE] URL do arquivo:', fileUrl)
+
+      // Fazer exclusão
+      const response = await this.apiService.request<void>(
+        `/v1/raffles/${raffleId}/file?fileUrl=${encodeURIComponent(fileUrl)}`,
+        {
+          method: 'DELETE'
+        }
+      )
+
+      if (response.success) {
+        console.log('✅ [FILE-DELETE] Exclusão realizada com sucesso')
+        return {
+          success: true,
+          message: 'Imagem excluída com sucesso'
+        }
+      } else {
+        console.error('❌ [FILE-DELETE] Erro na exclusão:', response.error)
+        return {
+          success: false,
+          error: response.error || 'Erro ao excluir a imagem'
+        }
+      }
+    } catch (error) {
+      console.error('💥 [FILE-DELETE] Erro inesperado:', error)
+      return {
+        success: false,
+        error: 'Erro inesperado ao excluir a imagem'
       }
     }
   }
