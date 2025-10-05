@@ -21,7 +21,6 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
   const [selectedImages, setSelectedImages] = useState<File[]>([])
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
     prize: '',
     maxNumbers: 0,
     startAt: '',
@@ -35,7 +34,6 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
       const maxNumbers = raffle.maxNumbers || 0
       setFormData({
         title: raffle.title || '',
-        description: raffle.description || '',
         prize: raffle.prize || '',
         maxNumbers: maxNumbers,
         startAt: raffle.startAt ? raffle.startAt.split('T')[0] + 'T' + raffle.startAt.split('T')[1].substring(0, 5) : '',
@@ -241,22 +239,6 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
                 disabled={isLoading}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="Digite o título da rifa"
-              />
-            </div>
-
-            {/* Descrição */}
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-                Descrição
-              </label>
-              <textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
-                disabled={isLoading}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                placeholder="Descreva a rifa"
               />
             </div>
 
