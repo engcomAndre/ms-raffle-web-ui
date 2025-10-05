@@ -13,7 +13,6 @@ jest.mock('@/services/raffleService', () => ({
 const mockRaffle: RaffleResponse = {
   id: 'raffle-123',
   title: 'Rifa Teste',
-  description: 'Descrição da rifa',
   prize: 'Prêmio Teste',
   maxNumbers: 100,
   startAt: '2024-12-01T10:00:00Z',
@@ -67,7 +66,6 @@ describe('RaffleEditModal', () => {
 
     expect(screen.getByText('Editar Rifa')).toBeInTheDocument()
     expect(screen.getByLabelText('Título *')).toBeInTheDocument()
-    expect(screen.getByLabelText('Descrição')).toBeInTheDocument()
     expect(screen.getByLabelText('Prêmio *')).toBeInTheDocument()
     expect(screen.getByLabelText(/Número máximo de números/)).toBeInTheDocument()
     expect(screen.getByLabelText('Data de início *')).toBeInTheDocument()
@@ -85,7 +83,6 @@ describe('RaffleEditModal', () => {
     )
 
     expect(screen.getByDisplayValue('Rifa Teste')).toBeInTheDocument()
-    expect(screen.getByDisplayValue('Descrição da rifa')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Prêmio Teste')).toBeInTheDocument()
     expect(screen.getByDisplayValue(100)).toBeInTheDocument()
   })
@@ -202,7 +199,6 @@ describe('RaffleEditModal', () => {
     await waitFor(() => {
       expect(raffleService.updateRaffle).toHaveBeenCalledWith('raffle-123', {
         title: 'Rifa Teste',
-        description: 'Descrição da rifa',
         prize: 'Prêmio Teste',
         maxNumbers: 100,
         startAt: '2024-12-01T10:00',
@@ -380,7 +376,6 @@ describe('RaffleEditModal', () => {
   it('deve lidar com rifa sem dados opcionais', () => {
     const raffleWithoutOptionalData: RaffleResponse = {
       ...mockRaffle,
-      description: undefined,
       startAt: undefined,
       endAt: undefined
     }

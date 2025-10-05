@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { RaffleResponse } from '@/types/raffle'
 import { raffleService } from '@/services/raffleService'
+import { InlineImageUpload } from './InlineImageUpload'
+import { fileUploadService } from '@/services/fileUploadService'
 
 interface RaffleEditModalProps {
   isOpen: boolean
@@ -16,9 +18,9 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
   const [isIncrementing, setIsIncrementing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [selectedImages, setSelectedImages] = useState<File[]>([])
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
     prize: '',
     maxNumbers: 0,
     startAt: '',
@@ -32,7 +34,6 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
       const maxNumbers = raffle.maxNumbers || 0
       setFormData({
         title: raffle.title || '',
-        description: raffle.description || '',
         prize: raffle.prize || '',
         maxNumbers: maxNumbers,
         startAt: raffle.startAt ? raffle.startAt.split('T')[0] + 'T' + raffle.startAt.split('T')[1].substring(0, 5) : '',
@@ -68,6 +69,10 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
       ...prev,
       [field]: value
     }))
+  }
+
+  const handleImagesChange = (images: File[]) => {
+    setSelectedImages(images)
   }
 
   const handleIncrementNumbers = async () => {
@@ -144,6 +149,29 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
 
       if (response.success) {
         console.log('✅ [RAFFLE-EDIT-MODAL] Rifa atualizada com sucesso')
+        
+        // Fazer upload das imagens se houver
+        if (selectedImages.length > 0) {
+          console.log('📤 [RAFFLE-EDIT-MODAL] Fazendo upload de imagens:', selectedImages.length)
+          const uploadPromises = selectedImages.map(image => 
+            fileUploadService.uploadRaffleImage(raffle.id, image)
+          )
+          
+          const uploadResults = await Promise.all(uploadPromises)
+          
+          // Verificar se algum upload falhou
+          const failedUploads = uploadResults.filter(result => !result.success)
+          if (failedUploads.length > 0) {
+            console.warn('⚠️ [RAFFLE-EDIT-MODAL] Alguns uploads falharam:', failedUploads)
+            setSuccessMessage(`Rifa atualizada com sucesso! ${failedUploads.length} imagens não foram enviadas.`)
+          } else {
+            console.log('✅ [RAFFLE-EDIT-MODAL] Todas as imagens enviadas com sucesso')
+            setSuccessMessage('Rifa atualizada e imagens enviadas com sucesso!')
+          }
+        } else {
+          setSuccessMessage('Rifa atualizada com sucesso!')
+        }
+        
         onSuccess()
         onClose()
       } else {
@@ -214,22 +242,6 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
               />
             </div>
 
-            {/* Descrição */}
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-                Descrição
-              </label>
-              <textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
-                disabled={isLoading}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                placeholder="Descreva a rifa"
-              />
-            </div>
-
             {/* Prêmio */}
             <div>
               <label htmlFor="prize" className="block text-sm font-medium text-gray-700 mb-2">
@@ -245,6 +257,29 @@ export function RaffleEditModal({ isOpen, onClose, raffle, onSuccess }: RaffleEd
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="Descreva o prêmio"
               />
+            </div>
+
+            {/* Seção de Upload de Imagens */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Imagens dos Prêmios da Rifa
+                </label>
+                <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                  Opcional • Até 5 imagens
+                </div>
+              </div>
+              
+              <InlineImageUpload
+                onImagesChange={handleImagesChange}
+                maxImages={5}
+                disabled={isLoading || isIncrementing}
+              />
+              
+              <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg mt-3">
+                <p className="font-medium mb-1">💡 Dica:</p>
+                <p>Adicione imagens do prêmio para atrair mais participantes! As imagens serão enviadas automaticamente após salvar as alterações.</p>
+              </div>
             </div>
 
             {/* Número máximo de números */}
