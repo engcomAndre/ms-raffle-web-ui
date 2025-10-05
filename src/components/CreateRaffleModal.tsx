@@ -226,9 +226,11 @@ export function CreateRaffleModal({ isOpen, onClose, onSuccess }: CreateRaffleMo
           </div>
 
           {/* Seção de Upload de Imagens */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium text-gray-900">Imagens da Rifa</h3>
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Imagens da Rifa
+              </label>
               <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
                 Opcional • Até 5 imagens
               </div>
@@ -240,7 +242,7 @@ export function CreateRaffleModal({ isOpen, onClose, onSuccess }: CreateRaffleMo
               disabled={isLoading}
             />
             
-            <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+            <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg mt-3">
               <p className="font-medium mb-1">💡 Dica:</p>
               <p>Adicione imagens do prêmio para atrair mais participantes! As imagens serão enviadas automaticamente após criar a rifa.</p>
             </div>
